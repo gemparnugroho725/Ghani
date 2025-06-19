@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kriptografi Asimetris & Teori Bilangan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #334155;
+            display: flex;
+            min-height: 100vh;
+        }
+        #sidebar {
+            width: 280px; /* Fixed width for sidebar */
+            background-color: #5c352a; /* Darker brown inspired by your image */
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0; /* Prevent sidebar from shrinking */
+        }
+        #sidebar-logo {
+            margin-bottom: 2rem;
+        }
+        #sidebar-logo img {
+            max-width: 120px;
+            height: auto;
+            border-radius: 50%; /* Make it circular */
+            object-fit: cover; /* Ensure image covers the space nicely */
+            aspect-ratio: 1 / 1; /* Maintain aspect ratio for circular images */
+            border: 3px solid #e2e8f0; /* Optional: add a border around the image */
+        }
+        #sidebar-logo h1 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        #sidebar-menu {
+            width: 100%;
+            flex-grow: 1;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.75rem; /* More rounded corners */
+            color: #e2e8f0;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .menu-item:hover {
+            background-color: #7a4f42; /* Lighter brown on hover */
+            color: white;
+        }
+        .menu-item.active {
+            background-color: #8c5d4b; /* Active state color */
+            color: white;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .menu-item i {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+        }
+        #main-content {
+            flex-grow: 1; /* Allow main content to take remaining space */
+            padding: 2rem;
+            overflow-y: auto; /* Enable scrolling for content */
+        }
+        .container {
+            max-width: 100%; /* No max-width for container inside main-content */
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem; /* Adjusted padding */
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Lighter shadow for inner cards */
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #475569;
+        }
+        .input-group input[type="text"],
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background-color: #f8fafc;
+            color: #334155;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .input-group input[type="text"]:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            outline: none;
+        }
+        .btn {
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .btn:hover {
+            background-color: #4338ca;
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        .output-area {
+            background-color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            word-wrap: break-word;
+            overflow-x: auto;
+            font-family: 'monospace';
+            color: #1a202c;
+            line-height: 1.5;
+            white-space: pre-wrap; /* Preserve whitespace and line breaks */
+        }
+        .output-area pre {
+            margin: 0;
+            padding: 0;
+        }
+        .warning {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        /* Hide all sections by default */
+        .content-section {
+            display: none;
+        }
+        /* Show active section */
+        .content-section.active {
+            display: block;
+        }
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        .radio-group input[type="radio"] {
+            margin-right: 0.5rem;
+            accent-color: #4f46e5; /* Accent color for radio button */
+            width: auto; /* Override 100% width */
+            padding: 0; /* Override padding */
+            border: none; /* Override border */
+            border-radius: 50%; /* Make it round */
+        }
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            #sidebar {
+                width: 100%;
+                height: auto;
+                padding: 1rem;
+                flex-direction: row; /* Horizontal for mobile */
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+            #sidebar-logo {
+                margin-bottom: 0;
+                display: flex;
+                align-items: center;
+            }
+            #sidebar-logo img {
+                max-width: 60px;
+                margin-right: 1rem;
+            }
+            #sidebar-logo h1 {
+                font-size: 1.25rem;
+            }
+            #sidebar-menu {
+                width: 100%;
+                margin-top: 1rem;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem; /* Spacing for horizontal menu items */
+            }
+            .menu-item {
+                padding: 0.5rem 0.75rem;
+                margin-bottom: 0;
+            }
+            .menu-item i {
+                margin-right: 0.5rem;
+            }
+            #main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <aside id="sidebar">
+        <div id="sidebar-logo">
+            <img id="user-logo-img" src="rplk.jpg" alt="Logo Pengguna">
+            <h1>Kripto Asimetris</h1>
+        </div>
+        <nav id="sidebar-menu">
+            <div class="menu-item active" data-target="welcome-section">
+                <i class="fas fa-home"></i> Beranda
+            </div>
+            <div class="menu-item" data-target="diffie-hellman">
+                <i class="fas fa-key"></i> Diffie-Hellman
+            </div>
+            <div class="menu-item" data-target="rsa">
+                <i class="fas fa-lock"></i> RSA Cryptosystem
+            </div>
+            <div class="menu-item" data-target="rabin">
+                <i class="fas fa-shield-alt"></i> Rabin Cryptosystem
+            </div>
+            <div class="menu-item" data-target="elgamal">
+                <i class="fas fa-envelope"></i> ElGamal Cryptosystem
+            </div>
+            <hr class="border-t border-gray-600 my-4 w-full">
+            <div class="menu-item" data-target="modular-exponentiation">
+                <i class="fas fa-calculator"></i> Modular Exponentiation
+            </div>
+            <div class="menu-item" data-target="extended-euclidean">
+                <i class="fas fa-ruler-combined"></i> Euclidean Extended
+            </div>
+            <div class="menu-item" data-target="crt">
+                <i class="fas fa-puzzle-piece"></i> Algoritma Gauss (CRT)
+            </div>
+            <div class="menu-item" data-target="prime-utilities">
+                <i class="fas fa-hashtag"></i> Utilitas Bilangan Prima
+            </div>
+            <div class="menu-item" data-target="generator-dlog">
+                <i class="fas fa-infinity"></i> Generator & Logaritma Diskrit
+            </div>
+        </nav>
+    </aside>
+
+    <main id="main-content">
+        <div class="container">
+            <div class="warning">
+                <p class="font-bold">Peringatan Penting:</p>
+                <p>Implementasi ini hanya untuk tujuan edukasi dan demonstrasi konsep. Ukuran angka yang digunakan relatif kecil. **JANGAN gunakan algoritma ini untuk keamanan nyata** karena tidak menawarkan perlindungan yang memadai terhadap serangan dunia nyata.</p>
+                <p class="font-bold mt-2">Catatan BigInt:</p>
+                <p>Aplikasi ini sekarang mendukung bilangan bulat besar (BigInt). Untuk angka yang sangat besar (lebih dari 15-16 digit), Anda mungkin mengalami perlambatan, terutama pada uji primality sederhana yang digunakan.</p>
+            </div>
+
+            <section id="welcome-section" class="content-section active">
+                <h2 class="text-3xl font-semibold mb-4 text-gray-700">Selamat Datang, RPLK!</h2>
+                <p class="mb-4">Aplikasi ini adalah demonstrasi interaktif dari beberapa algoritma kriptografi kunci publik dan algoritma teori bilangan pendukungnya. Anda dapat menjelajahi cara kerjanya dengan memasukkan parameter Anda sendiri dan melihat hasilnya.</p>
+                <p class="mb-4">Pilih algoritma dari menu di sisi kiri untuk memulai.</p>
+                <h3 class="text-xl font-medium mb-2 text-gray-600">Algoritma Kunci Publik</h3>
+                <ul class="list-disc list-inside mb-4 ml-4">
+                    <li>Diffie-Hellman Key Agreement: Untuk pertukaran kunci yang aman.</li>
+                    <li>RSA Cryptosystem: Untuk enkripsi dan tanda tangan digital.</li>
+                    <li>Rabin Cryptosystem: Sistem terbukti aman dengan ambiguitas dekripsi.</li>
+                    <li>ElGamal Cryptosystem: Sistem enkripsi berbasis logaritma diskrit.</li>
+                </ul>
+                   <h3 class="text-xl font-medium mb-2 text-gray-600">Algoritma Pendukung</h3>
+                <ul class="list-disc list-inside mb-4 ml-4">
+                    <li>Perpangkatan Modular (Algoritma Kuadrat-dan-Kali Berulang): Komputasi cepat $a^k \pmod n$.</li>
+                    <li>Extended Euclidean Algorithm: Menemukan GCD dan koefisien Bézout.</li>
+                    <li>Chinese Remainder Theorem (Algoritma Gauss): Memecahkan sistem kongruensi.</li>
+                    <li>Utilitas Bilangan Prima: Untuk memeriksa dan menemukan bilangan prima.</li>
+                    <li>Generator & Logaritma Diskrit: Untuk bekerja dengan generator grup dan memecahkan masalah logaritma diskrit.</li>
+                </ul>
+            </section>
+
+            <section id="diffie-hellman" class="content-section card">
+                <h2 class="text-3xl font-semibold mb-4 text-gray-700">Diffie-Hellman Key Agreement</h2>
+                <p class="mb-4">Algoritma Diffie-Hellman adalah protokol pertukaran kunci kriptografi pertama yang diusulkan. Keamanannya didasarkan pada sulitnya menyelesaikan masalah logaritma diskrit. Dua pihak dapat secara aman membuat kunci rahasia bersama melalui saluran yang tidak aman.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="dh-p">Bilangan Prima Besar (p):</label>
+                        <input type="text" id="dh-p" placeholder="Contoh: 23">
+                    </div>
+                    <div class="input-group">
+                        <label for="dh-g">Akar Primitif (g):</label>
+                        <input type="text" id="dh-g" placeholder="Contoh: 5">
+                    </div>
+                    <div class="input-group">
+                        <label for="dh-x">Kunci Privat Alice (x):</label>
+                        <input type="text" id="dh-x" placeholder="Contoh: 6">
+                    </div>
+                    <div class="input-group">
+                        <label for="dh-y">Kunci Privat Bob (y):</label>
+                        <input type="text" id="dh-y" placeholder="Contoh: 15">
+                    </div>
+                </div>
+                <button onclick="calculateDiffieHellman()" class="btn w-full md:w-auto">Hitung Kunci Bersama</button>
+                <div class="output-area" id="dh-output"></div>
+            </section>
+
+            <section id="rsa" class="content-section card">
+                <h2 class="text-3xl font-semibold mb-4 text-gray-700">RSA Cryptosystem</h2>
+                <p class="mb-4">RSA adalah salah satu sistem kriptografi kunci publik yang paling banyak digunakan untuk enkripsi dan tanda tangan digital. Keamanannya didasarkan pada kesulitan masalah faktorisasi bilangan bulat yang besar.</p>
+                
+                <h3 class="text-xl font-medium mb-2 text-gray-600">Pembangkitan Kunci</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="rsa-p">Prima p:</label>
+                        <input type="text" id="rsa-p" placeholder="Contoh: 61">
+                    </div>
+                    <div class="input-group">
+                        <label for="rsa-q">Prima q:</label>
+                        <input type="text" id="rsa-q" placeholder="Contoh: 53">
+                    </div>
+                </div>
+                <button onclick="generateRsaKeys()" class="btn w-full md:w-auto mb-4">Bangkitkan Kunci</button>
+                <div class="output-area" id="rsa-key-output"></div>
+
+                <h3 class="text-xl font-medium mt-6 mb-2 text-gray-600">Enkripsi</h3>
+                <div class="input-group">
+                    <label>Jenis Pesan:</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="rsaMessageType" value="numeric" checked onchange="toggleRsaMessageInput()"> Angka</label>
+                        <label><input type="radio" name="rsaMessageType" value="text" onchange="toggleRsaMessageInput()"> Teks</label>
+                    </div>
+                </div>
+
+                <div id="rsa-numeric-message-input" class="input-group mb-4">
+                    <label for="rsa-message-numeric">Pesan (m, sebagai bilangan bulat):</label>
+                    <input type="text" id="rsa-message-numeric" placeholder="Contoh: 123" value="123">
+                </div>
+
+                <div id="rsa-text-message-input" class="hidden">
+                    <div class="input-group mb-4">
+                        <label for="rsa-message-text">Pesan Teks (m):</label>
+                        <textarea id="rsa-message-text" rows="3" placeholder="Contoh: HALO DUNIA"></textarea>
+                    </div>
+                    <div class="input-group mb-4">
+                        <label for="rsa-text-conversion-method">Metode Konversi:</label>
+                        <select id="rsa-text-conversion-method">
+                            <option value="ascii">ASCII</option>
+                            <option value="alpha">Alfabet (A=00, Z=25)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="rsa-encrypt-n">Modulus n:</label>
+                        <input type="text" id="rsa-encrypt-n" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                    <div class="input-group">
+                        <label for="rsa-encrypt-e">Kunci Publik e:</label>
+                        <input type="text" id="rsa-encrypt-e" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                </div>
+                <button onclick="encryptRsa()" class="btn w-full md:w-auto mb-4">Enkripsi Pesan</button>
+                <div class="output-area" id="rsa-encrypt-output"></div>
+                <p class="text-gray-600 text-sm mt-2">
+                    <i class="fas fa-info-circle"></i> Catatan: Saat mengenkripsi teks panjang, pesan numerik mungkin melebihi modulus N. Dalam praktik, pesan akan dipecah menjadi beberapa blok yang lebih kecil dan setiap blok dienkripsi secara terpisah. Aplikasi ini memproses seluruh pesan sebagai satu blok numerik.
+                </p>
+
+                <h3 class="text-xl font-medium mt-6 mb-2 text-gray-600">Dekripsi</h3>
+                <div class="input-group">
+                    <label for="rsa-decrypt-conversion-method">Metode Konversi Dekripsi:</label>
+                    <select id="rsa-decrypt-conversion-method" class="mb-4">
+                        <option value="none">Tidak Ada (Hanya Angka)</option>
+                        <option value="ascii">ASCII</option>
+                        <option value="alpha">Alfabet (A=00, Z=25)</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="rsa-decrypt-n">Modulus n:</label>
+                        <input type="text" id="rsa-decrypt-n" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                    <div class="input-group">
+                        <label for="rsa-decrypt-d">Kunci Privat d:</label>
+                        <input type="text" id="rsa-decrypt-d" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                    <div class="input-group col-span-2">
+                        <label for="rsa-ciphertext">Ciphertext (c):</label>
+                        <input type="text" id="rsa-ciphertext" placeholder="Diisi otomatis dari Enkripsi, atau masukkan manual">
+                    </div>
+                </div>
+                <button onclick="decryptRsa()" class="btn w-full md:w-auto">Dekripsi Pesan</button>
+                <div class="output-area" id="rsa-decrypt-output"></div>
+            </section>
+
+            <section id="rabin" class="content-section card">
+                <h2 class="text-3xl font-semibold mb-4 text-gray-700">Rabin Cryptosystem</h2>
+                <p class="mb-4">Rabin adalah skema enkripsi kunci publik pertama yang secara matematis terbukti keamanannya setara dengan masalah faktorisasi bilangan bulat. Ciri khasnya adalah menghasilkan empat kemungkinan plaintext saat dekripsi.</p>
+                <p class="text-gray-600 text-sm mb-4">
+                    <i class="fas fa-info-circle"></i> Implementasi ini mengharuskan bilangan prima p dan q memiliki bentuk p &#8801; 3 (mod 4) dan q &#8801; 3 (mod 4), yang menyederhanakan perhitungan akar kuadrat modulo prima.
+                </p>
+                
+                <h3 class="text-xl font-medium mb-2 text-gray-600">Pembangkitan Kunci</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="rabin-p">Prima p (p &equiv; 3 mod 4):</label>
+                        <input type="text" id="rabin-p" placeholder="Contoh: 7">
+                    </div>
+                    <div class="input-group">
+                        <label for="rabin-q">Prima q (q &equiv; 3 mod 4):</label>
+                        <input type="text" id="rabin-q" placeholder="Contoh: 11">
+                    </div>
+                </div>
+                <button onclick="generateRabinKeys()" class="btn w-full md:w-auto mb-4">Bangkitkan Kunci</button>
+                <div class="output-area" id="rabin-key-output"></div>
+
+                <h3 class="text-xl font-medium mt-6 mb-2 text-gray-600">Enkripsi</h3>
+                <div class="input-group">
+                    <label>Jenis Pesan:</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="rabinMessageType" value="numeric" checked onchange="toggleRabinMessageInput()"> Angka</label>
+                        <label><input type="radio" name="rabinMessageType" value="text" onchange="toggleRabinMessageInput()"> Teks</label>
+                    </div>
+                </div>
+
+                <div id="rabin-numeric-message-input" class="input-group mb-4">
+                    <label for="rabin-message-numeric">Pesan (m, sebagai bilangan bulat):</label>
+                    <input type="text" id="rabin-message-numeric" placeholder="Contoh: 20" value="20">
+                </div>
+
+                <div id="rabin-text-message-input" class="hidden">
+                    <div class="input-group mb-4">
+                        <label for="rabin-message-text">Pesan Teks (m):</label>
+                        <textarea id="rabin-message-text" rows="3" placeholder="Contoh: TEST"></textarea>
+                    </div>
+                    <div class="input-group mb-4">
+                        <label for="rabin-text-conversion-method">Metode Konversi:</label>
+                        <select id="rabin-text-conversion-method">
+                            <option value="ascii">ASCII</option>
+                            <option value="alpha">Alfabet (A=00, Z=25)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group mb-4">
+                    <label for="rabin-encrypt-redundancy">Redundansi Biner Tambahan (misal: '00'):</label>
+                    <input type="text" id="rabin-encrypt-redundancy" placeholder="Contoh: 00">
+                    <small class="text-gray-500">Bitstring ini akan ditambahkan ke akhir representasi biner pesan.</small>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="rabin-encrypt-n">Modulus n:</label>
+                        <input type="text" id="rabin-encrypt-n" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                </div>
+                <button onclick="encryptRabin()" class="btn w-full md:w-auto mb-4">Enkripsi Pesan</button>
+                <div class="output-area" id="rabin-encrypt-output"></div>
+
+                <h3 class="text-xl font-medium mt-6 mb-2 text-gray-600">Dekripsi</h3>
+                <div class="input-group">
+                    <label for="rabin-decrypt-conversion-method">Metode Konversi Dekripsi:</label>
+                    <select id="rabin-decrypt-conversion-method" class="mb-4">
+                        <option value="none">Tidak Ada (Hanya Angka)</option>
+                        <option value="ascii">ASCII</option>
+                        <option value="alpha">Alfabet (A=00, Z=25)</option>
+                    </select>
+                </div>
+                <div class="input-group mb-4">
+                    <label for="rabin-decrypt-redundancy">Redundansi (bitstring, misal '00' jika pesan diakhiri '00'):</label>
+                    <input type="text" id="rabin-decrypt-redundancy" placeholder="Contoh: 00">
+                    <small class="text-gray-500">Opsional: Masukkan pola redundansi untuk membantu memilih plaintext yang benar.</small>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="rabin-decrypt-p">Prima p:</label>
+                        <input type="text" id="rabin-decrypt-p" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                    <div class="input-group">
+                        <label for="rabin-decrypt-q">Prima q:</label>
+                        <input type="text" id="rabin-decrypt-q" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                    <div class="input-group col-span-2">
+                        <label for="rabin-ciphertext">Ciphertext (c):</label>
+                        <input type="text" id="rabin-ciphertext" placeholder="Diisi otomatis dari Enkripsi, atau masukkan manual">
+                    </div>
+                </div>
+                <button onclick="decryptRabin()" class="btn w-full md:w-auto">Dekripsi Pesan</button>
+                <div class="output-area" id="rabin-decrypt-output"></div>
+            </section>
+
+            <section id="elgamal" class="content-section card">
+                <h2 class="text-3xl font-semibold mb-4 text-gray-700">ElGamal Cryptosystem</h2>
+                <p class="mb-4">ElGamal adalah skema kriptografi kunci publik yang dapat digunakan untuk enkripsi dan tanda tangan digital. Keamanannya didasarkan pada kesulitan masalah logaritma diskrit.</p>
+                
+                <h3 class="text-xl font-medium mb-2 text-gray-600">Pembangkitan Kunci</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="elgamal-p">Prima p:</label>
+                        <input type="text" id="elgamal-p" placeholder="Contoh: 23">
+                    </div>
+                    <div class="input-group">
+                        <label for="elgamal-alpha">Generator &alpha;:</label>
+                        <input type="text" id="elgamal-alpha" placeholder="Contoh: 5">
+                    </div>
+                    <div class="input-group col-span-2">
+                        <label for="elgamal-a">Kunci Privat a:</label>
+                        <input type="text" id="elgamal-a" placeholder="Contoh: 7">
+                    </div>
+                </div>
+                <button onclick="generateElGamalKeys()" class="btn w-full md:w-auto mb-4">Bangkitkan Kunci</button>
+                <div class="output-area" id="elgamal-key-output"></div>
+
+                <h3 class="text-xl font-medium mt-6 mb-2 text-gray-600">Enkripsi</h3>
+                <div class="input-group">
+                    <label>Jenis Pesan:</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="elgamalMessageType" value="numeric" checked onchange="toggleElGamalMessageInput()"> Angka</label>
+                        <label><input type="radio" name="elgamalMessageType" value="text" onchange="toggleElGamalMessageInput()"> Teks</label>
+                    </div>
+                </div>
+
+                <div id="elgamal-numeric-message-input" class="input-group mb-4">
+                    <label for="elgamal-message-numeric">Pesan (m, sebagai bilangan bulat):</label>
+                    <input type="text" id="elgamal-message-numeric" placeholder="Contoh: 15" value="15">
+                </div>
+
+                <div id="elgamal-text-message-input" class="hidden">
+                    <div class="input-group mb-4">
+                        <label for="elgamal-message-text">Pesan Teks (m):</label>
+                        <textarea id="elgamal-message-text" rows="3" placeholder="Contoh: Kripto"></textarea>
+                    </div>
+                    <div class="input-group mb-4">
+                        <label for="elgamal-text-conversion-method">Metode Konversi:</label>
+                        <select id="elgamal-text-conversion-method">
+                            <option value="ascii">ASCII</option>
+                            <option value="alpha">Alfabet (A=00, Z=25)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Generasi Bilangan Acak k:</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="elgamalKType" value="auto" checked onchange="toggleElGamalKInput()"> Otomatis</label>
+                        <label><input type="radio" name="elgamalKType" value="manual" onchange="toggleElGamalKInput()"> Manual</label>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="elgamal-encrypt-p">Prima p:</label>
+                        <input type="text" id="elgamal-encrypt-p" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                    <div class="input-group">
+                        <label for="elgamal-encrypt-alpha">Generator &alpha;:</label>
+                        <input type="text" id="elgamal-encrypt-alpha" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                    <div class="input-group">
+                        <label for="elgamal-encrypt-alpha-a">Kunci Publik &alpha;<sup>a</sup>:</label>
+                        <input type="text" id="elgamal-encrypt-alpha-a" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                    <div class="input-group">
+                        <label for="elgamal-k">Bilangan Bulat Acak k (1 &le; k &le; p-2):</label>
+                        <input type="text" id="elgamal-k" placeholder="Diisi otomatis atau manual">
+                    </div>
+                </div>
+                <button onclick="encryptElGamal()" class="btn w-full md:w-auto mb-4">Enkripsi Pesan</button>
+                <div class="output-area" id="elgamal-encrypt-output"></div>
+
+                <h3 class="text-xl font-medium mt-6 mb-2 text-gray-600">Dekripsi</h3>
+                <div class="input-group">
+                    <label for="elgamal-decrypt-conversion-method">Metode Konversi Dekripsi:</label>
+                    <select id="elgamal-decrypt-conversion-method" class="mb-4">
+                        <option value="none">Tidak Ada (Hanya Angka)</option>
+                        <option value="ascii">ASCII</option>
+                        <option value="alpha">Alfabet (A=00, Z=25)</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="elgamal-decrypt-p">Prima p:</label>
+                        <input type="text" id="elgamal-decrypt-p" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                    <div class="input-group">
+                        <label for="elgamal-decrypt-a">Kunci Privat a:</label>
+                        <input type="text" id="elgamal-decrypt-a" placeholder="Diisi otomatis dari Pembangkitan Kunci, atau masukkan manual">
+                    </div>
+                    <div class="input-group">
+                        <label for="elgamal-decrypt-y">Ciphertext y:</label>
+                        <input type="text" id="elgamal-decrypt-y" placeholder="Diisi otomatis dari Enkripsi, atau masukkan manual">
+                    </div>
+                    <div class="input-group">
+                        <label for="elgamal-decrypt-delta">Ciphertext &delta;:</label>
+                        <input type="text" id="elgamal-decrypt-delta" placeholder="Diisi otomatis dari Enkripsi, atau masukkan manual">
+                    </div>
+                </div>
+                <button onclick="decryptElGamal()" class="btn w-full md:w-auto">Dekripsi Pesan</button>
+                <div class="output-area" id="elgamal-decrypt-output"></div>
+            </section>
+
+            <section id="modular-exponentiation" class="content-section card">
+                <h2 class="text-3xl font-semibold mb-4 text-gray-700">Perpangkatan Modular (Algoritma Kuadrat-dan-Kali Berulang)</h2>
+                <p class="mb-4">Algoritma ini menghitung $a^k \pmod n$ secara efisien, yang merupakan operasi krusial dalam banyak algoritma kriptografi kunci publik. Ini juga dikenal sebagai algoritma Kuadrat-dan-Kali Berulang.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="me-base">Basis (a):</label>
+                        <input type="text" id="me-base" placeholder="Contoh: 5">
+                    </div>
+                    <div class="input-group">
+                        <label for="me-exp">Eksponen (k):</label>
+                        <input type="text" id="me-exp" placeholder="Contoh: 3">
+                    </div>
+                    <div class="input-group">
+                        <label for="me-mod">Modulus (n):</label>
+                        <input type="text" id="me-mod" placeholder="Contoh: 13">
+                    </div>
+                </div>
+                <button onclick="calculateModularExponentiation()" class="btn w-full md:w-auto">Hitung Perpangkatan Modular</button>
+                <div class="output-area" id="me-output"></div>
+            </section>
+
+            <section id="extended-euclidean" class="content-section card">
+                <h2 class="text-3xl font-semibold mb-4 text-gray-700">Extended Euclidean Algorithm</h2>
+                <p class="mb-4">Algoritma ini tidak hanya menghitung pembagi persekutuan terbesar (GCD) dari dua bilangan bulat $a$ dan $b$, tetapi juga menemukan bilangan bulat $x$ dan $y$ yang memenuhi identitas Bézout: $ax + by = \text{gcd}(a,b)$.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="ee-a">Bilangan A:</label>
+                        <input type="text" id="ee-a" placeholder="Contoh: 26513">
+                    </div>
+                    <div class="input-group">
+                        <label for="ee-b">Bilangan B:</label>
+                        <input type="text" id="ee-b" placeholder="Contoh: 32321">
+                    </div>
+                </div>
+                <button onclick="calculateExtendedEuclidean()" class="btn w-full md:w-auto">Hitung GCD & Koefisien Bézout</button>
+                <div class="output-area" id="ee-output"></div>
+            </section>
+
+            <section id="crt" class="content-section card">
+                <h2 class="text-3xl font-semibold mb-4 text-gray-700">Chinese Remainder Theorem (Algoritma Gauss)</h2>
+                <p class="mb-4">Teorema Sisa Cina (CRT) digunakan untuk menyelesaikan sistem kongruensi linier. Algoritma Gauss menyediakan metode eksplisit untuk menemukan solusi. Masukkan kongruensi dalam format <code>a1,n1; a2,n2; ...</code></p>
+                <div class="input-group mb-4">
+                    <label for="crt-input">Kongruensi (a,n; format: a1,n1; a2,n2; ...):</label>
+                    <input type="text" id="crt-input" placeholder="Contoh: 2,3; 3,5; 2,7">
+                </div>
+                <button onclick="solveChineseRemainderTheorem()" class="btn w-full md:w-auto">Selesaikan Kongruensi</button>
+                <div class="output-area" id="crt-output"></div>
+            </section>
+
+            <section id="prime-utilities" class="content-section card">
+                <h2 class="text-3xl font-semibold mb-4 text-gray-700">Utilitas Bilangan Prima</h2>
+                <p class="mb-4">Bagian ini menyediakan alat untuk memeriksa sifat bilangan prima dan menemukan bilangan prima.
+                    <br><strong class="text-red-600">Peringatan:</strong> Perhitungan untuk angka yang sangat besar bisa memakan waktu atau tidak akurat dengan metode sederhana ini.
+                </p>
+
+                <h3 class="text-xl font-medium mt-6 mb-2 text-gray-600">Periksa Bilangan Prima & Posisi</h3>
+                <div class="input-group mb-4">
+                    <label for="prime-check-number">Bilangan:</label>
+                    <input type="text" id="prime-check-number" placeholder="Contoh: 127">
+                    <small class="text-gray-500">Akan memeriksa apakah bilangan adalah prima dan prima ke berapa (hingga batas yang wajar).</small>
+                </div>
+                <button onclick="checkPrimeAndPosition()" class="btn w-full md:w-auto mb-4">Periksa</button>
+                <div class="output-area" id="prime-check-output"></div>
+
+                <h3 class="text-xl font-medium mt-6 mb-2 text-gray-600">Temukan Bilangan Prima Ke-N</h3>
+                <div class="input-group mb-4">
+                    <label for="nth-prime-input">Temukan prima ke-N (N):</label>
+                    <input type="text" id="nth-prime-input" placeholder="Contoh: 1000">
+                    <small class="text-gray-500">Mencari bilangan prima ke-N. Nilai N yang terlalu besar akan sangat lambat.</small>
+                </div>
+                <button onclick="findNthPrime()" class="btn w-full md:w-auto mb-4">Temukan</button>
+                <div class="output-area" id="nth-prime-output"></div>
+            </section>
+
+            <section id="generator-dlog" class="content-section card">
+                <h2 class="text-3xl font-semibold mb-4 text-gray-700">Generator & Logaritma Diskrit</h2>
+                <p class="mb-4">Bagian ini mengeksplorasi konsep generator grup multiplikatif modulo prima dan masalah logaritma diskrit yang mendasari keamanan banyak algoritma kunci publik.
+                </p>
+
+                <h3 class="text-xl font-medium mt-6 mb-2 text-gray-600">Temukan Generator Terkecil untuk $\mathbb{Z}_{p}^{*}$</h3>
+                <p class="text-red-600 font-bold mb-2">
+                    <i class="fas fa-exclamation-triangle"></i> Peringatan: Metode brute-force ini sangat tidak efisien untuk bilangan prima 'p' yang besar. Perhitungan dapat memakan waktu lama dan mungkin membekukan browser. Disarankan p < 10.000.
+                </p>
+                <div class="input-group mb-4">
+                    <label for="generator-p">Bilangan Prima (p):</label>
+                    <input type="text" id="generator-p" placeholder="Contoh: 23">
+                </div>
+                <button onclick="findSmallestGenerator()" class="btn w-full md:w-auto mb-4">Temukan Generator</button>
+                <div class="output-area" id="generator-output"></div>
+
+                <h3 class="text-xl font-medium mt-6 mb-2 text-gray-600">Pemecah Logaritma Diskrit (Brute-Force)</h3>
+                <p class="text-red-600 font-bold mb-2">
+                    <i class="fas fa-exclamation-triangle"></i> Peringatan: Metode brute-force ini sangat tidak efisien untuk angka besar. Perhitungan dapat memakan waktu lama dan mungkin membekukan browser. Disarankan p < 10.000.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="input-group">
+                        <label for="dlog-g">Basis (g):</label>
+                        <input type="text" id="dlog-g" placeholder="Contoh: 5">
+                    </div>
+                    <div class="input-group">
+                        <label for="dlog-y">Nilai (y):</label>
+                        <input type="text" id="dlog-y" placeholder="Contoh: 17">
+                    </div>
+                    <div class="input-group">
+                        <label for="dlog-p">Modulus (p):</label>
+                        <input type="text" id="dlog-p" placeholder="Contoh: 23">
+                    </div>
+                </div>
+                <button onclick="solveDiscreteLogarithm()" class="btn w-full md:w-auto mb-4">Selesaikan Logaritma Diskrit</button>
+                <div class="output-area" id="dlog-output"></div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        // --- UTILITY FUNCTIONS ---
+
+        // Helper function to safely parse BigInt from string
+        function parseBigInt(value) {
+            try {
+                // Ensure value is not empty or just whitespace
+                if (typeof value === 'string' && value.trim() === '') {
+                    return null;
+                }
+                return BigInt(value);
+            } catch (e) {
+                return null; // Return null for invalid or empty input
+            }
+        }
+
+        // Fungsi GCD (Euclidean Algorithm)
+        function gcd(a, b) {
+            // Ensure inputs are BigInt and non-negative
+            a = a < 0n ? -a : a;
+            b = b < 0n ? -b : b;
+            let steps = [];
+            steps.push(`Langkah-langkah Algoritma Euclidean untuk GCD(${a}, ${b}):`);
+            let original_a = a;
+            let original_b = b;
+            let current_a = a;
+            let current_b = b;
+
+            let step_number = 1;
+            while (current_b !== 0n) {
+                const quotient = current_a / current_b;
+                const remainder = current_a % current_b;
+                steps.push(`  Langkah ${step_number++}: ${current_a} = ${quotient} * ${current_b} + ${remainder}`);
+                current_a = current_b;
+                current_b = remainder;
+            }
+            steps.push(`  Ketika sisa bagi menjadi 0, GCD adalah ${current_a}`);
+            return { result: current_a, steps: steps.join('\n') };
+        }
+
+        // Fungsi Extended Euclidean Algorithm
+        // Mengembalikan { gcd, x, y, steps } sedemikian rupa sehingga ax + by = gcd(a, b)
+        function extendedGcd(a, b) {
+            let steps = [];
+            steps.push(`<strong>Langkah-langkah Extended Euclidean Algorithm untuk mencari x, y sedemikian hingga ${a}x + ${b}y = gcd(${a}, ${b}):</strong>`);
+
+            // Ensure inputs are BigInt and non-negative for consistent display, and store original values
+            const a_orig = a < 0n ? -a : a;
+            const b_orig = b < 0n ? -b : b;
+            
+            let r_values_euclidean = []; // Stores [dividend, divisor, quotient, remainder] for Euclidean phase
+
+            let current_r0_euclidean = a_orig;
+            let current_r1_euclidean = b_orig;
+            
+            // Phase 1: Euclidean Algorithm to find quotients and remainders
+            steps.push(`\n1.  <strong>Fase Algoritma Euclidean (Mencari Sisa dan Hasil Bagi):</strong>`);
+            let eq_num = 0;
+            while (current_r1_euclidean !== 0n) {
+                const q = current_r0_euclidean / current_r1_euclidean;
+                const r_next = current_r0_euclidean % current_r1_euclidean;
+                steps.push(`    [Eq ${eq_num}]: ${current_r0_euclidean} = ${q} * ${current_r1_euclidean} + ${r_next}`);
+                r_values_euclidean.push({ dividend: current_r0_euclidean, divisor: current_r1_euclidean, quotient: q, remainder: r_next });
+                current_r0_euclidean = current_r1_euclidean;
+                current_r1_euclidean = r_next;
+                eq_num++;
+            }
+            const final_gcd = current_r0_euclidean;
+            steps.push(`    Ketika sisa bagi menjadi 0, GCD adalah ${final_gcd}.`);
+
+            // Phase 2: Iterative calculation of s and t coefficients (using a table format)
+            steps.push(`\n2.  <strong>Fase Koefisien Bézout (Menghitung x dan y secara Iteratif):</strong>`);
+            steps.push(`    Kita mencari x dan y untuk persamaan ${a_orig}x + ${b_orig}y = ${final_gcd}.`);
+            steps.push(`    Kita menggunakan tabel untuk menghitung koefisien s dan t (yaitu x dan y):`);
+            steps.push(`    `); // Add an empty line for spacing
+            steps.push(`    | r     | q     | s     | t     |`);
+            steps.push(`    |-------|-------|-------|-------|`);
+            steps.push(`    | ${a_orig}   |       | 1     | 0     |`); // Initial s0, t0 for a_orig
+            steps.push(`    | ${b_orig}   |       | 0     | 1     |`); // Initial s1, t1 for b_orig
+
+            let s0 = 1n, s1 = 0n;
+            let t0 = 0n, t1 = 1n;
+            let current_r0 = a_orig; // Re-initialize r0, r1 for this phase's loop
+            let current_r1 = b_orig;
+            
+            let i = 0;
+            while (current_r1 !== 0n) {
+                const q = current_r0 / current_r1;
+                const r_next = current_r0 % current_r1;
+                
+                const s_new = s0 - q * s1;
+                const t_new = t0 - q * t1;
+                
+                steps.push(`    | ${r_next}    | ${q}     | ${s_new} | ${t_new} |`);
+
+                s0 = s1; s1 = s_new;
+                t0 = t1; t1 = t_new;
+                current_r0 = current_r1;  
+                current_r1 = r_next;
+                i++;
+            }
+            
+            const final_x = s0;
+            const final_y = t0;
+
+            steps.push(`\n    Ketika r menjadi ${final_gcd}, koefisien s (x) adalah ${final_x} dan t (y) adalah ${final_y}.`);
+            steps.push(`    Jadi, x = ${final_x}, y = ${final_y}.`);
+
+            // Phase 3: Conceptual Back-substitution (using illustrative examples from Euclidean equations)
+            steps.push(`\n3.  <strong>Fase Substitusi Balik (Penjelasan Konseptual):</strong>`);
+            steps.push(`    Konsep substitusi balik adalah menggunakan setiap persamaan dari Fase Algoritma Euclidean untuk menyatakan sisa bagi (remainder) sebagai kombinasi linear dari dua bilangan sebelumnya.`);
+            
+            if (r_values_euclidean.length > 0) {
+                // Get the equation where the GCD is the remainder
+                let gcd_eq_found = false;
+                for(let j = r_values_euclidean.length - 1; j >= 0; j--) {
+                    if (r_values_euclidean[j].remainder === final_gcd) {
+                        const { remainder, dividend, divisor, quotient } = r_values_euclidean[j];
+                        steps.push(`    Misalnya, dari persamaan [Eq ${j}]: ${dividend} = ${quotient} * ${divisor} + ${remainder}`);
+                        steps.push(`    Kita bisa menulis ulang menjadi: ${remainder} = ${dividend} - ${quotient} * ${divisor}`);
+                        steps.push(`    Lalu, kita akan secara berulang mengganti sisa-sisa yang lebih kecil dari persamaan sebelumnya`);
+                        steps.push(`    ke dalam ekspresi ini, hingga kita mendapatkan ekspresi akhir`);
+                        steps.push(`    untuk GCD hanya dalam bentuk ${a_orig} dan ${b_orig}.`);
+                        gcd_eq_found = true;
+                        break; // Stop after finding the first one (which is the last for non-zero remainder)
+                    }
+                }
+                if (!gcd_eq_found) { // This handles cases where GCD is a or b initially
+                    steps.push(`    GCD(${a_orig}, ${b_orig}) = ${final_gcd}. Salah satu input adalah kelipatan dari yang lain, atau salah satu input adalah 0.`);
+                }
+            } else {
+                steps.push(`    Tidak ada langkah substitusi balik yang ditunjukkan karena GCD ditemukan pada langkah pertama (salah satu input adalah 0).`);
+            }
+            
+            steps.push(`\n    Proses ini secara implisit dilakukan oleh Algoritma Extended Euclidean dengan menghitung koefisien 's' dan 't' secara iteratif, yang menghasilkan:`);
+            steps.push(`    ${final_gcd} = ${a_orig} * (${final_x}) + ${b_orig} * (${final_y})`);
+
+            return { gcd: final_gcd, x: final_x, y: final_y, steps: steps.join('\n') };
+        }
+
+        // Fungsi Modular Inverse (a^-1 mod m)
+        function modInverse(a, m) {
+            const { gcd: g, x, steps: egcdSteps } = extendedGcd(a, m);
+            if (g !== 1n) {
+                throw new Error(`Invers modular tidak ada karena GCD(${a}, ${m}) = ${g} (bukan 1). Bilangan tidak koprima.`);
+            }
+            const inv = (x % m + m) % m; // Pastikan hasilnya positif BigInt
+            return { result: inv, steps: `${egcdSteps}\nInvers modular ${a}<sup>-1</sup> mod ${m} adalah (${x} % ${m} + ${m}) % ${m} = <strong>${inv}</strong>` };
+        }
+
+        // Fungsi Modular Exponentiation (a^b mod m) - Algoritma Kuadrat-dan-Kali Berulang
+        function power(base, exp, mod) {
+            let res = 1n;
+            base %= mod;
+            let steps = [];
+            steps.push(`Perhitungan ${base}<sup>${exp}</sup> mod ${mod} menggunakan Algoritma Kuadrat-dan-Kali Berulang:`);
+            steps.push(`  Inisialisasi: result = 1, current_base = ${base} % ${mod} = ${base}`);
+            steps.push(`  Eksponen (biner): ${exp} (${exp.toString(2)})`);
+
+            let tempExp = exp;
+            let currentBase = base;
+            let i = 0;
+            while (tempExp > 0n) {
+                steps.push(`\n  Iterasi ${i++}:`);
+                steps.push(`    Eksponen saat ini: ${tempExp} (${tempExp.toString(2)})`);
+                steps.push(`    Basis saat ini: ${currentBase}`);
+
+                if (tempExp % 2n === 1n) {
+                    const oldRes = res;
+                    res = (res * currentBase) % mod;
+                    steps.push(`    Bit paling kanan (LSB) eksponen adalah 1: result = (result * currentBase) mod modulus = (${oldRes} * ${currentBase}) mod ${mod} = ${res}`);
+                } else {
+                    steps.push(`    Bit paling kanan (LSB) eksponen adalah 0: result tetap ${res}`);
+                }
+                const oldCurrentBase = currentBase;
+                currentBase = (currentBase * currentBase) % mod;
+                steps.push(`    Basis dikuadratkan: currentBase = (currentBase * currentBase) mod modulus = (${oldCurrentBase} * ${oldCurrentBase}) mod ${mod} = ${currentBase}`);
+                tempExp /= 2n; // Shift right by 1 bit (equivalent to integer division by 2)
+                steps.push(`    Eksponen dibagi 2: ${tempExp}`);
+            }
+            steps.push(`\nFinal result: ${res}`);
+            return { result: res, steps: steps.join('\n') };
+        }
+
+        // Fungsi pengujian primality sederhana (trial division)
+        // Peringatan: Sangat tidak efisien dan tidak akurat untuk BigInt yang sangat besar.
+        function isSmallPrimeTrialDivision(num) {
+            if (num <= 1n) return false;
+            if (num <= 3n) return true;
+            if (num % 2n === 0n || num % 3n === 0n) return false;
+            for (let i = 5n; i * i <= num; i = i + 6n) {
+                if (num % i === 0n || num % (i + 2n) === 0n) return false;
+            }
+            return true;
+        }
+
+        // Sieve of Eratosthenes for finding primes up to a limit
+        function sieveOfEratosthenes(limit) {
+            if (limit < 2n) return { primes: [], steps: "Batas terlalu kecil untuk Sieve." };
+            const sieve = new Array(Number(limit) + 1).fill(true);
+            sieve[0] = sieve[1] = false; // 0 and 1 are not prime
+            let primes = [];
+            let steps = [];
+
+            steps.push(`Menjalankan Sieve of Eratosthenes hingga ${limit}:`);
+            steps.push(`  Inisialisasi array sieve dengan semua nilai 'true' (kecuali 0 dan 1).`);
+
+            for (let p_num = 2; p_num <= limit; p_num++) {
+                if (sieve[p_num]) {
+                    primes.push(BigInt(p_num));
+                    steps.push(`  Menemukan prima: ${p_num}. Menandai kelipatannya sebagai non-prima:`);
+                    for (let multiple = p_num * p_num; multiple <= limit; multiple += p_num) {
+                        sieve[multiple] = false;
+                        // steps.push(`    Menandai ${multiple} (kelipatan dari ${p_num}) sebagai non-prima.`); // Too verbose for large limits
+                    }
+                }
+            }
+            steps.push(`  Selesai. Bilangan prima yang ditemukan: ${primes.join(', ')}.`);
+            return { primes: primes, steps: steps.join('\n') };
+        }
+
+        // Fungsi untuk mengonversi BigInt ke representasi biner
+        function dec2bin(dec) {
+            if (dec === null || dec === undefined || dec < 0n) return '';
+            return dec.toString(2);
+        }
+
+        // Fungsi untuk mengonversi Teks ke BigInt
+        function textToBigInt(text, method, outputDiv) {
+            if (!text) {
+                outputDiv.innerHTML = '<span class="text-red-600">Pesan teks tidak boleh kosong.</span>';
+                return null;
+            }
+
+            let numericValue;
+            let conversionSteps = [];
+
+            if (method === 'ascii') {
+                numericValue = asciiToBigInt(text);
+                conversionSteps.push(`Konversi Teks ke Angka (ASCII):`);
+                conversionSteps.push(`  Setiap karakter dikonversi ke nilai ASCII desimalnya, lalu digabungkan.`);
+                conversionSteps.push(`  Misal: 'A' (ASCII 65) akan menjadi '065'.`);
+                
+                let tempCombined = '';
+                for (let i = 0; i < text.length; i++) {
+                    const charCode = text.charCodeAt(i);
+                    // Ensure charCode is padded to 3 digits for consistent length (e.g., 065, 097, 122)
+                    const formattedCharCode = charCode.toString().padStart(3, '0');
+                    tempCombined += formattedCharCode;
+                    conversionSteps.push(`    '${text[i]}' (ASCII: ${charCode}) -> "${formattedCharCode}"`);
+                }
+                conversionSteps.push(`  Nilai Gabungan (Desimal): ${tempCombined}`);
+            } else if (method === 'alpha') {
+                numericValue = alphaToBigInt(text);
+                conversionSteps.push(`Konversi Teks ke Angka (Alfabet A=00 sampai Z=25):`);
+                conversionSteps.push(`  Hanya huruf kapital A-Z yang diproses. Karakter lain diabaikan.`);
+                conversionSteps.push(`  Setiap huruf dikonversi ke nilai 00-25, lalu digabungkan.`);
+                conversionSteps.push(`  Misal: 'A' -> '00', 'B' -> '01', ..., 'Z' -> '25'.`);
+
+                let tempAlphaString = '';
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i].toUpperCase();
+                    if (char >= 'A' && char <= 'Z') {
+                        const charValue = char.charCodeAt(0) - 'A'.charCodeAt(0);
+                        const formattedValue = charValue.toString().padStart(2, '0');
+                        tempAlphaString += formattedValue;
+                        conversionSteps.push(`    '${char}' -> "${formattedValue}"`);
+                    } else {
+                        conversionSteps.push(`    '${text[i]}' diabaikan.`);
+                    }
+                }
+                conversionSteps.push(`  Nilai Gabungan (Desimal): ${tempAlphaString}`);
+            } else {
+                outputDiv.innerHTML = '<span class="text-red-600">Metode konversi teks tidak valid.</span>';
+                return null;
+            }
+            
+            outputDiv.innerHTML = conversionSteps.join('\n');
+            return numericValue;
+        }
+
+        // Konversi ASCII ke BigInt
+        function asciiToBigInt(text) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                // Pad ASCII values to ensure fixed length (e.g., 065, 097, 122) for easier reconstruction
+                // Max ASCII is 127. Using 3 digits.
+                result += text.charCodeAt(i).toString().padStart(3, '0');
+            }
+            return BigInt(result);
+        }
+
+        // Konversi A=00, Z=25 ke BigInt
+        function alphaToBigInt(text) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i].toUpperCase();
+                if (char >= 'A' && char <= 'Z') {
+                    result += (char.charCodeAt(0) - 'A'.charCodeAt(0)).toString().padStart(2, '0');
+                }
+                // Ignore non-alphabetic characters as per requirement
+            }
+            return BigInt(result);
+        }
+
+        // Konversi BigInt ke Teks (dari ASCII)
+        function bigIntToAsciiText(bigInt) {
+            let str = bigInt.toString();
+            let result = '';
+            // Since we padded each ASCII char code to 3 digits during encoding
+            if (str.length % 3 !== 0) {
+                 // Pad front with zeros if necessary to make length a multiple of 3
+                 str = str.padStart(Math.ceil(str.length / 3) * 3, '0');
+            }
+            for (let i = 0; i < str.length; i += 3) {
+                let charCode = parseInt(str.substring(i, i + 3), 10);
+                // Basic check for printable ASCII range
+                if (charCode >= 32 && charCode <= 126) { 
+                    result += String.fromCharCode(charCode);
+                } else {
+                    result += `[${charCode}]`; // Indicate non-printable or invalid
+                }
+            }
+            return result;
+        }
+
+        // Konversi BigInt ke Teks (dari A=00, Z=25)
+        function bigIntToAlphaText(bigInt) {
+            let str = bigInt.toString();
+            let result = '';
+            // Pad front with zeros if necessary to make length a multiple of 2
+            if (str.length % 2 !== 0) {
+                str = str.padStart(Math.ceil(str.length / 2) * 2, '0');
+            }
+            for (let i = 0; i < str.length; i += 2) {
+                let charValue = parseInt(str.substring(i, i + 2), 10);
+                if (charValue >= 0 && charValue <= 25) {
+                    result += String.fromCharCode('A'.charCodeAt(0) + charValue);
+                } else {
+                    result += `[${charValue}]`; // Indicate invalid value
+                }
+            }
+            return result;
+        }
+
+        // Generate random BigInt within a range [min, max]
+        function generateRandomBigInt(min, max) {
+            if (min > max) {
+                [min, max] = [max, min]; // Swap if min > max
+            }
+            const range = max - min + 1n;
+            if (range <= 0n) return min; // Handle case where range is 0 or negative (shouldn't happen with proper input)
+
+            // Calculate number of bits needed for the range
+            const numBits = BigInt(range.toString(2).length);
+            
+            // Get random bytes, convert to BigInt, and take modulo to fit the range
+            let randomBigInt;
+            do {
+                const randomBytes = new Uint8Array(Math.ceil(Number(numBits) / 8));
+                window.crypto.getRandomValues(randomBytes);
+                let hex = '';
+                randomBytes.forEach(b => hex += b.toString(16).padStart(2, '0'));
+                randomBigInt = BigInt('0x' + hex);
+            } while (randomBigInt >= range); // Loop until it's within the range
+
+            return randomBigInt + min;
+        }
+
+        // Calculate prime factors of (p-1) for generator finding
+        function getPrimeFactors(num) {
+            let factors = [];
+            let d = 2n;
+            let tempNum = num;
+            while (d * d <= tempNum) {
+                if (tempNum % d === 0n) {
+                    factors.push(d);
+                    while (tempNum % d === 0n) {
+                        tempNum /= d;
+                    }
+                }
+                d++;
+            }
+            if (tempNum > 1n) {
+                factors.push(tempNum);
+            }
+            return factors;
+        }
+
+        // --- UI TOGGLE FUNCTIONS ---
+        function toggleRsaMessageInput() {
+            const messageType = document.querySelector('input[name="rsaMessageType"]:checked').value;
+            document.getElementById('rsa-numeric-message-input').classList.toggle('hidden', messageType === 'text');
+            document.getElementById('rsa-text-message-input').classList.toggle('hidden', messageType === 'numeric');
+        }
+
+        function toggleRabinMessageInput() {
+            const messageType = document.querySelector('input[name="rabinMessageType"]:checked').value;
+            document.getElementById('rabin-numeric-message-input').classList.toggle('hidden', messageType === 'text');
+            document.getElementById('rabin-text-message-input').classList.toggle('hidden', messageType === 'numeric');
+        }
+
+        function toggleElGamalMessageInput() {
+            const messageType = document.querySelector('input[name="elgamalMessageType"]:checked').value;
+            document.getElementById('elgamal-numeric-message-input').classList.toggle('hidden', messageType === 'text');
+            document.getElementById('elgamal-text-message-input').classList.toggle('hidden', messageType === 'numeric');
+        }
+
+        function toggleElGamalKInput() {
+            const kType = document.querySelector('input[name="elgamalKType"]:checked').value;
+            const kInput = document.getElementById('elgamal-k');
+            kInput.readOnly = (kType === 'auto');
+            kInput.placeholder = (kType === 'auto') ? 'Diisi otomatis atau manual' : 'Masukkan k';
+            if (kType === 'auto') {
+                kInput.value = ''; // Clear manual input if switching to auto
+            }
+        }
+
+        // --- ALGORITHMS IMPLEMENTATION ---
+
+        // Diffie-Hellman Key Agreement
+        function calculateDiffieHellman() {
+            const p = parseBigInt(document.getElementById('dh-p').value);
+            const g = parseBigInt(document.getElementById('dh-g').value);
+            const x = parseBigInt(document.getElementById('dh-x').value); // Alice's private key
+            const y = parseBigInt(document.getElementById('dh-y').value); // Bob's private key
+            const outputDiv = document.getElementById('dh-output');
+
+            if (p === null || g === null || x === null || y === null) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap isi semua input dengan angka valid.</span>';
+                return;
+            }
+            if (p <= 0n || g <= 0n || x <= 0n || y <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Semua input harus bilangan positif.</span>';
+                return;
+            }
+            if (!isSmallPrimeTrialDivision(p)) {
+                outputDiv.innerHTML = '<span class="text-red-600">p harus bilangan prima. (Peringatan: Uji primality sederhana, mungkin lambat/tidak akurat untuk angka besar).</span>';
+                return;
+            }
+            if (g >= p || g <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">g harus dalam rentang (0, p).</span>';
+                return;
+            }
+             if (x >= p || y >= p) {
+                outputDiv.innerHTML = '<span class="text-red-600">Kunci privat (x dan y) harus kurang dari p.</span>';
+                return;
+            }
+
+
+            let steps = [`<strong>Langkah-langkah Diffie-Hellman Key Agreement:</strong>`];
+            steps.push(`\n1.  <strong>Parameter Umum:</strong>`);
+            steps.push(`    p = ${p} (Bilangan Prima)`);
+            steps.push(`    g = ${g} (Akar Primitif / Generator)`);
+
+            steps.push(`\n2.  <strong>Perhitungan Alice:</strong>`);
+            steps.push(`    Kunci Privat Alice (x): ${x}`);
+            const { result: X, steps: X_steps } = power(g, x, p);
+            steps.push(`    Kunci Publik Alice (X = g<sup>x</sup> mod p):`);
+            steps.push(X_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+            steps.push(`    X = ${X}`);
+
+            steps.push(`\n3.  <strong>Perhitungan Bob:</strong>`);
+            steps.push(`    Kunci Privat Bob (y): ${y}`);
+            const { result: Y, steps: Y_steps } = power(g, y, p);
+            steps.push(`    Kunci Publik Bob (Y = g<sup>y</sup> mod p):`);
+            steps.push(Y_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+            steps.push(`    Y = ${Y}`);
+
+            steps.push(`\n4.  <strong>Pertukaran Kunci:</strong>`);
+            steps.push(`    Alice mengirim X (${X}) ke Bob.`);
+            steps.push(`    Bob mengirim Y (${Y}) ke Alice.`);
+
+            steps.push(`\n5.  <strong>Alice Menghitung Kunci Rahasia Bersama:</strong>`);
+            steps.push(`    k<sub>Alice</sub> = Y<sup>x</sup> mod p`);
+            const { result: kAlice, steps: kAlice_steps } = power(Y, x, p);
+            steps.push(kAlice_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+            steps.push(`    k<sub>Alice</sub> = ${kAlice}`);
+
+            steps.push(`\n6.  <strong>Bob Menghitung Kunci Rahasia Bersama:</strong>`);
+            steps.push(`    k<sub>Bob</sub> = X<sup>y</sup> mod p`);
+            const { result: kBob, steps: kBob_steps } = power(X, y, p);
+            steps.push(kBob_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+            steps.push(`    k<sub>Bob</sub> = ${kBob}`);
+
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            steps.push(`Kunci Rahasia Bersama yang Dihasilkan: <strong>${kAlice}</strong> (sama untuk Alice dan Bob)`);
+            
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        // RSA Cryptosystem
+        let rsaKeys = {}; // Stores generated keys for auto-filling other forms
+
+        function generateRsaKeys() {
+            const p = parseBigInt(document.getElementById('rsa-p').value);
+            const q = parseBigInt(document.getElementById('rsa-q').value);
+            const outputDiv = document.getElementById('rsa-key-output');
+
+            if (p === null || q === null) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap isi prima p dan q dengan angka valid.</span>';
+                return;
+            }
+            if (p <= 0n || q <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">p dan q harus bilangan positif.</span>';
+                return;
+            }
+            if (!isSmallPrimeTrialDivision(p)) {
+                outputDiv.innerHTML = '<span class="text-red-600">p harus bilangan prima. (Peringatan: Uji primality sederhana, mungkin lambat/tidak akurat untuk angka besar).</span>';
+                return;
+            }
+            if (!isSmallPrimeTrialDivision(q)) {
+                outputDiv.innerHTML = '<span class="text-red-600">q harus bilangan prima. (Peringatan: Uji primality sederhana, mungkin lambat/tidak akurat untuk angka besar).</span>';
+                return;
+            }
+            if (p === q) {
+                outputDiv.innerHTML = '<span class="text-red-600">p dan q harus berbeda.</span>';
+                return;
+            }
+
+            let steps = [`<strong>Langkah-langkah Pembangkitan Kunci RSA:</strong>`];
+
+            steps.push(`\n1.  <strong>Pilih dua bilangan prima berbeda:</strong>`);
+            steps.push(`    p = ${p}`);
+            steps.push(`    q = ${q}`);
+
+            const n = p * q;
+            steps.push(`\n2.  <strong>Hitung modulus n dan fungsi totient Euler &phi;(n):</strong>`);
+            steps.push(`    n = p * q = ${p} * ${q} = ${n}`);
+            const phi = (p - 1n) * (q - 1n);
+            steps.push(`    &phi;(n) = (p-1) * (q-1) = (${p}-1) * (${q}-1) = ${phi}`);
+
+            // Choosing e (public exponent)
+            let e_candidates = [65537n, 3n, 5n, 17n]; // Prioritize these common values
+            let e_found = null;
+            
+            steps.push(`\n3.  <strong>Pilih eksponen publik e:</strong>`);
+            steps.push(`    Mencari e sedemikian hingga 1 < e < &phi;(n) dan gcd(e, &phi;(n)) = 1`);
+
+            // Try predefined candidates first
+            for (let candidate of e_candidates) {
+                if (candidate >= phi) { // Candidate is too large for phi
+                    steps.push(`    Mencoba e = ${candidate}: Terlalu besar (&ge; &phi;).`);
+                    continue;  
+                }
+                let { result: gcd_res } = gcd(candidate, phi); // No need for steps here as it's just a check
+                if (gcd_res === 1n) {
+                    e_found = candidate;
+                    steps.push(`    Mencoba e = ${candidate}: GCD(${candidate}, ${phi}) = 1.`);
+                    steps.push(`    Dipilih e = <strong>${e_found}</strong>`);
+                    break;
+                } else {
+                    steps.push(`    Mencoba e = ${candidate}: GCD(${candidate}, ${phi}) = ${gcd_res} (tidak koprima).`);
+                }
+            }
+
+            // If no candidate found, iterate to find one
+            if (e_found === null) {
+                let current_e_iter = 2n; 
+                steps.push(`    Tidak ada kandidat umum yang cocok. Mencari e secara iteratif:`);
+                while (current_e_iter < phi) {
+                    let { result: gcd_res } = gcd(current_e_iter, phi);
+                    if (gcd_res === 1n) {
+                        e_found = current_e_iter;
+                        steps.push(`    Ditemukan e = ${e_found}: GCD(${e_found}, ${phi}) = 1.`);
+                        steps.push(`    Dipilih e = <strong>${e_found}</strong>`);
+                        break;
+                    }
+                    current_e_iter++; 
+                    if (current_e_iter > 10000n && current_e_iter < phi / 2n) { // Limit search to avoid very long loops for large phi
+                        steps.push(`<span class="text-red-600">Peringatan: Pencarian 'e' mungkin sangat lama untuk nilai p dan q yang sangat besar. Coba nilai yang lebih kecil atau jalankan kembali.</span>`);
+                        e_found = null;
+                        break;
+                    }
+                }
+            }
+
+            if (e_found === null || e_found < 2n || e_found >= phi) {
+                outputDiv.innerHTML = '<span class="text-red-600">Tidak dapat menemukan eksponen enkripsi (e) yang valid. Coba prima p dan q yang berbeda atau lebih besar.</span>';
+                return;
+            }
+            let e = e_found; // Assign the found e to the main variable
+            
+            let d;
+            steps.push(`\n4.  <strong>Hitung eksponen privat d:</strong>`);
+            steps.push(`    ed &equiv; 1 (mod &phi;(n))`);
+            steps.push(`    Menggunakan Extended Euclidean Algorithm untuk mencari d = e<sup>-1</sup> mod &phi;(n):`);
+            try {
+                const { result: d_calc, steps: modInverse_steps } = modInverse(e, phi);
+                d = d_calc;
+                steps.push(modInverse_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+                steps.push(`    d = <strong>${d}</strong>`);
+            } catch (error) {
+                outputDiv.innerHTML = `<span class="text-red-600">Error menghitung d: ${error.message}. Pastikan e koprima dengan phi.</span>`;
+                return;
+            }
+            
+            rsaKeys = { p, q, n, phi, e, d };
+
+            // Auto-fill inputs, but don't make them readonly
+            document.getElementById('rsa-encrypt-n').value = n.toString();
+            document.getElementById('rsa-encrypt-e').value = e.toString();
+            document.getElementById('rsa-decrypt-n').value = n.toString();
+            document.getElementById('rsa-decrypt-d').value = d.toString();
+
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            steps.push(`Kunci Publik (n, e): <strong>(${n}, ${e})</strong>`);
+            steps.push(`Kunci Privat (n, d): <strong>(${n}, ${d})</strong>`);
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        function encryptRsa() {
+            const n = parseBigInt(document.getElementById('rsa-encrypt-n').value);
+            const e = parseBigInt(document.getElementById('rsa-encrypt-e').value);
+            const messageType = document.querySelector('input[name="rsaMessageType"]:checked').value;
+            const outputDiv = document.getElementById('rsa-encrypt-output');
+            
+            let m;
+            let originalMessageText = '';
+            let conversionSteps = '';
+
+            if (messageType === 'numeric') {
+                m = parseBigInt(document.getElementById('rsa-message-numeric').value);
+                originalMessageText = `Angka: ${m}`;
+            } else { // messageType === 'text'
+                originalMessageText = document.getElementById('rsa-message-text').value;
+                const conversionMethod = document.getElementById('rsa-text-conversion-method').value;
+                const tempDiv = document.createElement('div'); // Temporary div to capture conversion steps
+                m = textToBigInt(originalMessageText, conversionMethod, tempDiv);
+                conversionSteps = tempDiv.innerHTML;
+            }
+
+            if (n === null || e === null || m === null) {
+                if (!outputDiv.innerHTML.includes('text-red-600')) { // Don't overwrite existing error
+                    outputDiv.innerHTML = '<span class="text-red-600">Harap isi semua input dengan angka/teks valid.</span>';
+                }
+                return;
+            }
+            if (m >= n || m < 0n) {
+                outputDiv.innerHTML = `<span class="text-red-600">Pesan (m = ${m}) harus dalam rentang [0, n-1 = ${n-1n}]. Ukuran pesan mungkin terlalu besar untuk modulus yang diberikan.</span>`;
+                return;
+            }
+
+            let steps = [`<strong>Langkah-langkah Enkripsi RSA:</strong>`];
+            steps.push(`\n1.  <strong>Pesan Plaintext (m):</strong>`);
+            steps.push(`    Nilai Asli: ${originalMessageText}`);
+            if (conversionSteps) {
+                steps.push(`    ${conversionSteps}`);
+            }
+            steps.push(`    Nilai Numerik yang Digunakan: <strong>${m}</strong>`);
+
+
+            steps.push(`\n2.  <strong>Kunci Publik Penerima:</strong> (n = ${n}, e = ${e})`);
+            steps.push(`\n3.  <strong>Hitung Ciphertext (c = m<sup>e</sup> mod n):</strong>`);
+            const { result: c, steps: c_steps } = power(m, e, n);
+            steps.push(c_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+            steps.push(`    c = <strong>${c}</strong>`);
+
+            document.getElementById('rsa-ciphertext').value = c.toString();
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            steps.push(`Ciphertext (c): <strong>${c}</strong>`);
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        function decryptRsa() {
+            const n = parseBigInt(document.getElementById('rsa-decrypt-n').value);
+            const d = parseBigInt(document.getElementById('rsa-decrypt-d').value);
+            const c = parseBigInt(document.getElementById('rsa-ciphertext').value);
+            const conversionMethod = document.getElementById('rsa-decrypt-conversion-method').value;
+            const outputDiv = document.getElementById('rsa-decrypt-output');
+
+            if (n === null || d === null || c === null) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap isi semua input dengan angka valid.</span>';
+                return;
+            }
+            if (c >= n || c < 0n) {
+                 outputDiv.innerHTML = `<span class="text-red-600">Ciphertext (c = ${c}) harus dalam rentang [0, n-1 = ${n-1n}].</span>`;
+                return;
+            }
+
+            let steps = [`<strong>Langkah-langkah Dekripsi RSA:</strong>`];
+            steps.push(`\n1.  <strong>Kunci Privat Penerima:</strong> (n = ${n}, d = ${d})`);
+            steps.push(`2.  <strong>Ciphertext (c):</strong> ${c}`);
+            steps.push(`\n3.  <strong>Hitung Pesan Terdekripsi (m = c<sup>d</sup> mod n):</strong>`);
+            const { result: decryptedM, steps: m_steps } = power(c, d, n);
+            steps.push(m_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+            steps.push(`    m = <strong>${decryptedM}</strong>`);
+
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            steps.push(`Pesan Terdekripsi (angka): <strong>${decryptedM}</strong>`);
+
+            if (conversionMethod === 'ascii') {
+                const decryptedText = bigIntToAsciiText(decryptedM);
+                steps.push(`Pesan Terdekripsi (teks - ASCII): <strong>${decryptedText}</strong>`);
+            } else if (conversionMethod === 'alpha') {
+                const decryptedText = bigIntToAlphaText(decryptedM);
+                steps.push(`Pesan Terdekripsi (teks - Alfabet A=00): <strong>${decryptedText}</strong>`);
+            } else {
+                steps.push(`Pilih metode konversi untuk melihat pesan teks.`);
+            }
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        // Rabin Cryptosystem
+        let rabinKeys = {}; // Stores Rabin keys
+
+        // Fungsi untuk mencari akar kuadrat modulo p (p prima, p = 3 mod 4)
+        function sqrtModPrime3Mod4(a, p) {
+            // Formula untuk p = 3 mod 4: x = a^((p+1)/4) mod p
+            const exp = (p + 1n) / 4n;
+            const { result: root, steps: power_steps } = power(a, exp, p);
+            return { roots: [root, p - root], steps: power_steps };
+        }
+
+        // Fungsi untuk mencari empat akar kuadrat modulo n = pq (p, q prima, p=3mod4, q=3mod4)
+        function getRabinRoots(c, p, q) {
+            const n = p * q;
+            let currentSteps = []; // Use a local variable for these steps
+
+            currentSteps.push(`    3.1. Hitung akar kuadrat c mod p:`);
+            currentSteps.push(`        Mencari x<sub>p</sub> sedemikian hingga x<sub>p</sub><sup>2</sup> &equiv; ${c} (mod ${p})`);
+            const { roots: [rp1, rp2], steps: rp_steps } = sqrtModPrime3Mod4(c % p, p); // akar kuadrat c mod p
+            currentSteps.push(rp_steps.split('\n').map(line => `        ${line}`).join('\n'));
+            currentSteps.push(`        Akar kuadrat c mod ${p} adalah x<sub>p1</sub> = ${rp1} dan x<sub>p2</sub> = ${rp2}`);
+
+            currentSteps.push(`\n    3.2. Hitung akar kuadrat c mod q:`);
+            currentSteps.push(`        Mencari x<sub>q</sub> sedemikian hingga x<sub>q</sub><sup>2</sup> &equiv; ${c} (mod ${q})`);
+            const { roots: [rq1, rq2], steps: rq_steps } = sqrtModPrime3Mod4(c % q, q); // akar kuadrat c mod q
+            currentSteps.push(rq_steps.split('\n').map(line => `        ${line}`).join('\n'));
+            currentSteps.push(`        Akar kuadrat c mod ${q} adalah x<sub>q1</sub> = ${rq1} dan x<sub>q2</sub> = ${rq2}`);
+
+            // Use Extended Euclidean Algorithm to find inv_q_mod_p and inv_p_mod_q
+            currentSteps.push(`\n    3.3. Menggunakan Extended Euclidean Algorithm untuk mencari invers modular:`);
+            currentSteps.push(`        i. Cari q<sup>-1</sup> mod p:`);
+            const { result: q_inv_p, steps: q_inv_p_steps } = modInverse(q, p);
+            currentSteps.push(q_inv_p_steps.split('\n').map(line => `        ${line}`).join('\n'));
+            currentSteps.push(`        Didapat q<sup>-1</sup> mod p (${q}<sup>-1</sup> mod ${p}) = ${q_inv_p}`);
+
+            currentSteps.push(`\n        ii. Cari p<sup>-1</sup> mod q:`);
+            const { result: p_inv_q, steps: p_inv_q_steps } = modInverse(p, q);
+            currentSteps.push(p_inv_q_steps.split('\n').map(line => `        ${line}`).join('\n'));
+            currentSteps.push(`        Didapat p<sup>-1</sup> mod q (${p}<sup>-1</sup> mod ${q}) = ${p_inv_q}`);
+
+            const roots = [];
+
+            // 3. Gabungkan akar-akar menggunakan CRT (seperti Algoritma 6.4)
+            // x = (rp * q * (q^-1 mod p) + rq * p * (p^-1 mod q)) mod n
+            currentSteps.push(`\n    3.4. Gabungkan akar-akar menggunakan Chinese Remainder Theorem (CRT) untuk mendapatkan 4 solusi:`);
+            
+            // Combination 1: (rp1, rq1)
+            let term1_1 = rp1 * q * q_inv_p;
+            let term2_1 = rq1 * p * p_inv_q;
+            let x1 = (term1_1 + term2_1) % n;
+            roots.push((x1 + n) % n); // Ensure positive
+            currentSteps.push(`        Kombinasi 1 (x &equiv; ${rp1} mod ${p}, x &equiv; ${rq1} mod ${q}):`);
+            currentSteps.push(`            x<sub>1</sub> = (${rp1} * ${q} * ${q_inv_p} + ${rq1} * ${p} * ${p_inv_q}) mod ${n}`);
+            currentSteps.push(`            x<sub>1</sub> = (${rp1 * q} * ${q_inv_p} + ${rq1 * p} * ${p_inv_q}) mod ${n}`);
+            currentSteps.push(`            x<sub>1</sub> = (${term1_1} + ${term2_1}) mod ${n}`);
+            currentSteps.push(`            x<sub>1</sub> = ${x1} mod ${n} = ${roots[0]}`);
+
+            // Combination 2: (rp1, rq2)
+            let term1_2 = rp1 * q * q_inv_p;
+            let term2_2 = rq2 * p * p_inv_q;
+            let x2 = (term1_2 + term2_2) % n;
+            roots.push((x2 + n) % n);
+            currentSteps.push(`\n        Kombinasi 2 (x &equiv; ${rp1} mod ${p}, x &equiv; ${rq2} mod ${q}):`);
+            currentSteps.push(`            x<sub>2</sub> = (${rp1} * ${q} * ${q_inv_p} + ${rq2} * ${p} * ${p_inv_q}) mod ${n}`);
+            currentSteps.push(`            x<sub>2</sub> = (${rp1 * q} * ${q_inv_p} + ${rq2 * p} * ${p_inv_q}) mod ${n}`);
+            currentSteps.push(`            x<sub>2</sub> = (${term1_2} + ${term2_2}) mod ${n}`);
+            currentSteps.push(`            x<sub>2</sub> = ${x2} mod ${n} = ${roots[1]}`);
+
+            // Combination 3: (rp2, rq1)
+            let term1_3 = rp2 * q * q_inv_p;
+            let term2_3 = rq1 * p * p_inv_q;
+            let x3 = (term1_3 + term2_3) % n;
+            roots.push((x3 + n) % n);
+            currentSteps.push(`\n        Kombinasi 3 (x &equiv; ${rp2} mod ${p}, x &equiv; ${rq1} mod ${q}):`);
+            currentSteps.push(`            x<sub>3</sub> = (${rp2} * ${q} * ${q_inv_p} + ${rq1} * ${p} * ${p_inv_q}) mod ${n}`);
+            currentSteps.push(`            x<sub>3</sub> = (${rp2 * q} * ${q_inv_p} + ${rq1 * p} * ${p_inv_q}) mod ${n}`);
+            currentSteps.push(`            x<sub>3</sub> = (${term1_3} + ${term2_3}) mod ${n}`);
+            currentSteps.push(`            x<sub>3</sub> = ${x3} mod ${n} = ${roots[2]}`);
+
+            // Combination 4: (rp2, rq2)
+            let term1_4 = rp2 * q * q_inv_p;
+            let term2_4 = rq2 * p * p_inv_q;
+            let x4 = (term1_4 + term2_4) % n;
+            roots.push((x4 + n) % n);
+            currentSteps.push(`\n        Kombinasi 4 (x &equiv; ${rp2} mod ${p}, x &equiv; ${rq2} mod ${q}):`);
+            currentSteps.push(`            x<sub>4</sub> = (${rp2} * ${q} * ${q_inv_p} + ${rq2} * ${p} * ${p_inv_q}) mod ${n}`);
+            currentSteps.push(`            x<sub>4</sub> = (${rp2 * q} * ${q_inv_p} + ${rq2 * p} * ${p_inv_q}) mod ${n}`);
+            currentSteps.push(`            x<sub>4</sub> = (${term1_4} + ${term2_4}) mod ${n}`);
+            currentSteps.push(`            x<sub>4</sub> = ${x4} mod ${n} = ${roots[3]}`);
+            
+            // Sort and remove duplicates (if any, though rare for n=pq)
+            const uniqueSortedRoots = [...new Set(roots.sort((a, b) => {
+                if (a < b) return -1;
+                if (a > b) return 1;
+                return 0;
+            }))];  
+            
+            return { roots: uniqueSortedRoots, steps: currentSteps.join('\n') };
+        }
+
+        function generateRabinKeys() {
+            const p = parseBigInt(document.getElementById('rabin-p').value);
+            const q = parseBigInt(document.getElementById('rabin-q').value);
+            const outputDiv = document.getElementById('rabin-key-output');
+
+            if (p === null || q === null) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap isi prima p dan q dengan angka valid.</span>';
+                return;
+            }
+            if (p <= 0n || q <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">p dan q harus bilangan positif.</span>';
+                return;
+            }
+            if (!isSmallPrimeTrialDivision(p)) {
+                outputDiv.innerHTML = '<span class="text-red-600">p harus bilangan prima. (Peringatan: Uji primality sederhana, mungkin lambat/tidak akurat untuk angka besar).</span>';
+                return;
+            }
+            if (!isSmallPrimeTrialDivision(q)) {
+                outputDiv.innerHTML = '<span class="text-red-600">q harus bilangan prima. (Peringatan: Uji primality sederhana, mungkin lambat/tidak akurat untuk angka besar).</span>';
+                return;
+            }
+            if (p === q) {
+                outputDiv.innerHTML = '<span class="text-red-600">p dan q harus berbeda.</span>';
+                return;
+            }
+            if (p % 4n !== 3n || q % 4n !== 3n) {
+                outputDiv.innerHTML = '<span class="text-red-600">p dan q harus kongruen 3 modulo 4 (p &#8801; 3 (mod 4) dan q &#8801; 3 (mod 4)).</span>';
+                return;
+            }
+
+            let steps = [`<strong>Langkah-langkah Pembangkitan Kunci Rabin:</strong>`];
+
+            steps.push(`\n1.  <strong>Pilih dua bilangan prima berbeda:</strong>`);
+            steps.push(`    p = ${p} (dengan p &equiv; 3 mod 4)`);
+            steps.push(`    q = ${q} (dengan q &equiv; 3 mod 4)`);
+
+            const n = p * q;
+            steps.push(`\n2.  <strong>Hitung modulus n:</strong>`);
+            steps.push(`    n = p * q = ${p} * ${q} = ${n}`);
+            
+            rabinKeys = { p, q, n };
+
+            // Auto-fill inputs, but don't make them readonly
+            document.getElementById('rabin-encrypt-n').value = n.toString();
+            document.getElementById('rabin-decrypt-p').value = p.toString();
+            document.getElementById('rabin-decrypt-q').value = q.toString();
+
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            steps.push(`Kunci Publik: <strong>n = ${n}</strong>`);
+            steps.push(`Kunci Privat: <strong>(p = ${p}, q = ${q})</strong>`);
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        function encryptRabin() {
+            const n = parseBigInt(document.getElementById('rabin-encrypt-n').value);
+            const messageType = document.querySelector('input[name="rabinMessageType"]:checked').value;
+            const redundancy = document.getElementById('rabin-encrypt-redundancy').value.trim();
+            const outputDiv = document.getElementById('rabin-encrypt-output');
+            
+            let m_orig;
+            let originalMessageText = '';
+            let conversionSteps = '';
+
+            if (messageType === 'numeric') {
+                m_orig = parseBigInt(document.getElementById('rabin-message-numeric').value);
+                originalMessageText = `Angka: ${m_orig}`;
+            } else { // messageType === 'text'
+                originalMessageText = document.getElementById('rabin-message-text').value;
+                const conversionMethod = document.getElementById('rabin-text-conversion-method').value;
+                const tempDiv = document.createElement('div');
+                m_orig = textToBigInt(originalMessageText, conversionMethod, tempDiv);
+                conversionSteps = tempDiv.innerHTML;
+            }
+
+            if (n === null || m_orig === null) {
+                if (!outputDiv.innerHTML.includes('text-red-600')) {
+                    outputDiv.innerHTML = '<span class="text-red-600">Harap isi semua input dengan angka/teks valid.</span>';
+                }
+                return;
+            }
+            if (m_orig >= n || m_orig < 0n) {
+                outputDiv.innerHTML = `<span class="text-red-600">Pesan (m = ${m_orig}) harus dalam rentang [0, n-1 = ${n-1n}]. Ukuran pesan mungkin terlalu besar untuk modulus yang diberikan.</span>`;
+                return;
+            }
+            if (redundancy && !/^[01]*$/.test(redundancy)) {
+                outputDiv.innerHTML = '<span class="text-red-600">Redundansi harus berupa bitstring (hanya 0 dan 1).</span>';
+                return;
+            }
+
+            let steps = [`<strong>Langkah-langkah Enkripsi Rabin:</strong>`];
+            steps.push(`\n1.  <strong>Pesan Plaintext (m):</strong>`);
+            steps.push(`    Nilai Asli: ${originalMessageText}`);
+            if (conversionSteps) {
+                steps.push(`    ${conversionSteps}`);
+            }
+            steps.push(`    Nilai Numerik yang Digunakan: <strong>${m_orig}</strong>`);
+            steps.push(`\n2.  <strong>Kunci Publik Penerima:</strong> n = ${n}`);
+            
+            let m_with_redundancy = m_orig;
+            let redundancy_display = '';
+            if (redundancy) {
+                const m_binary = dec2bin(m_orig);
+                const combined_binary = m_binary + redundancy;
+                m_with_redundancy = BigInt('0b' + combined_binary);
+                steps.push(`\n3.  <strong>Tambahkan Redundansi:</strong>`);
+                steps.push(`    Pesan dalam biner: ${m_binary}`);
+                steps.push(`    Redundansi ('${redundancy}') ditambahkan: ${combined_binary}`);
+                steps.push(`    Pesan baru (m') dalam desimal: <strong>${m_with_redundancy}</strong>`);
+                redundancy_display = ` (dengan redundansi '${redundancy}')`;
+            } else {
+                steps.push(`\n3.  <strong>Tanpa Redundansi Tambahan.</strong>`);
+            }
+            
+            if (m_with_redundancy >= n || m_with_redundancy < 0n) {
+                outputDiv.innerHTML = `<span class="text-red-600">Pesan yang dimodifikasi (m' = ${m_with_redundancy}) dengan redundansi terlalu besar untuk modulus n = ${n}. Coba pesan yang lebih pendek atau n yang lebih besar.</span>`;
+                return;
+            }
+
+            steps.push(`\n4.  <strong>Hitung Ciphertext (c = (m')<sup>2</sup> mod n):</strong>`);
+            const { result: c, steps: c_steps } = power(m_with_redundancy, 2n, n); // Using 2n for BigInt exponent
+            steps.push(c_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+            steps.push(`    c = <strong>${c}</strong>`);
+            
+            document.getElementById('rabin-ciphertext').value = c.toString();
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            steps.push(`Ciphertext (c): <strong>${c}</strong>`);
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        function decryptRabin() {
+            const p = parseBigInt(document.getElementById('rabin-decrypt-p').value);
+            const q = parseBigInt(document.getElementById('rabin-decrypt-q').value);
+            const c = parseBigInt(document.getElementById('rabin-ciphertext').value);
+            const redundancy = document.getElementById('rabin-decrypt-redundancy').value.trim();
+            const conversionMethod = document.getElementById('rabin-decrypt-conversion-method').value;
+            const outputDiv = document.getElementById('rabin-decrypt-output');
+
+            if (p === null || q === null || c === null) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap isi semua input dengan angka valid.</span>';
+                return;
+            }
+            if (p <= 0n || q <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">p dan q harus bilangan positif.</span>';
+                return;
+            }
+            if (c < 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Ciphertext harus bilangan non-negatif.</span>';
+                return;
+            }
+             if (!isSmallPrimeTrialDivision(p) || !isSmallPrimeTrialDivision(q)) {
+                outputDiv.innerHTML = '<span class="text-red-600">p dan q harus bilangan prima. (Peringatan: Uji primality sederhana, mungkin lambat/tidak akurat untuk angka besar).</span>';
+                return;
+            }
+            if (p % 4n !== 3n || q % 4n !== 3n) {
+                outputDiv.innerHTML = '<span class="text-red-600">p dan q harus kongruen 3 modulo 4 (p &#8801; 3 (mod 4) dan q &#8801; 3 (mod 4)).</span>';
+                return;
+            }
+            if (redundancy && !/^[01]*$/.test(redundancy)) {
+                outputDiv.innerHTML = '<span class="text-red-600">Redundansi harus berupa bitstring (hanya 0 dan 1).</span>';
+                return;
+            }
+
+            let steps = [`<strong>Langkah-langkah Dekripsi Rabin:</strong>`];
+            steps.push(`\n1.  <strong>Kunci Privat Penerima:</strong> (p = ${p}, q = ${q})`);
+            steps.push(`2.  <strong>Ciphertext (c):</strong> ${c}`);
+
+            let roots;
+            let rootCalculationSteps;
+            try {
+                const result = getRabinRoots(c, p, q);
+                roots = result.roots;
+                rootCalculationSteps = result.steps;
+                steps.push(rootCalculationSteps); // Already formatted with indentation
+            } catch (error) {
+                outputDiv.innerHTML = `<span class="text-red-600">Error dalam dekripsi: ${error.message}. Pastikan p dan q adalah prima dan kongruen 3 mod 4, dan ciphertext valid.</span>`;
+                return;
+            }
+
+            steps.push(`\n<strong>Empat Kemungkinan Plaintext (Numeric) dari Akar Kuadrat Modulo n:</strong>`);
+            roots.forEach((root, index) => {
+                steps.push(`    m'<sub>${index + 1}</sub> = ${root}`);
+            });
+            
+            let foundMatch = false;
+            let matchedRoot = null;
+            let decryptedTexts = [];
+
+            if (redundancy) {
+                steps.push(`\n4.  <strong>Verifikasi Redundansi ('${redundancy}'):</strong>`);
+                roots.forEach((root, index) => {
+                    let rootBinary = dec2bin(root);
+                    let isMatch = rootBinary.endsWith(redundancy);
+                    let originalMsgBinary = isMatch ? rootBinary.substring(0, Math.max(0, rootBinary.length - redundancy.length)) : 'N/A'; // Ensure non-negative length
+                    let originalMsgNumeric = originalMsgBinary !== 'N/A' && originalMsgBinary !== '' ? BigInt('0b' + originalMsgBinary) : 'N/A';
+
+                    steps.push(`    m'<sub>${index + 1}</sub> = ${root} (Biner: ${rootBinary})`);
+                    steps.push(`        Pencocokan Redundansi: ${isMatch ? '✅ Sesuai' : '❌ Tidak Sesuai'}`);
+                    if (isMatch) {
+                        steps.push(`        Pesan Asli (Biner): ${originalMsgBinary}`);
+                        steps.push(`        Pesan Asli (Numerik): ${originalMsgNumeric}`);
+                        foundMatch = true;
+                        matchedRoot = originalMsgNumeric;
+                        
+                        if (conversionMethod === 'ascii') {
+                            decryptedTexts.push(`Teks (ASCII): ${bigIntToAsciiText(originalMsgNumeric)}`);
+                        } else if (conversionMethod === 'alpha') {
+                            decryptedTexts.push(`Teks (Alfabet A=00): ${bigIntToAlphaText(originalMsgNumeric)}`);
+                        }
+                    }
+                });
+                
+                steps.push(`\n<strong>Hasil Akhir:</strong>`);
+                if (foundMatch) {
+                    steps.push(`Pesan yang benar (sesuai redundansi '${redundancy}', numerik): <strong>${matchedRoot}</strong>`);
+                    if (decryptedTexts.length > 0) {
+                        steps.push(`Pesan yang benar (teks):`);
+                        decryptedTexts.forEach(text => steps.push(`    <strong>${text}</strong>`));
+                    }
+                } else {
+                    steps.push(`<span class="text-red-600">Tidak ada pesan yang sesuai dengan redundansi yang diberikan. Ciphertext mungkin rusak atau redundansi salah.</span>`);
+                }
+            } else {
+                steps.push(`Pilih plaintext yang benar dari daftar di atas (jika ada konteks atau redundansi).`);
+                steps.push(`\n<strong>Hasil Akhir (tanpa redundansi spesifik):</strong>`);
+                roots.forEach((root, index) => {
+                    let decryptedText = '';
+                     if (conversionMethod === 'ascii') {
+                        decryptedText = bigIntToAsciiText(root);
+                        steps.push(`    m'<sub>${index + 1}</sub> = ${root} (Teks ASCII: ${decryptedText})`);
+                    } else if (conversionMethod === 'alpha') {
+                        decryptedText = bigIntToAlphaText(root);
+                        steps.push(`    m'<sub>${index + 1}</sub> = ${root} (Teks Alfabet A=00: ${decryptedText})`);
+                    } else {
+                        steps.push(`    m'<sub>${index + 1}</sub> = ${root}`);
+                    }
+                });
+                steps.push(`Pilih metode konversi untuk melihat pesan teks.`);
+            }
+            
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        // ElGamal Cryptosystem
+        let elgamalKeys = {};
+
+        function generateElGamalKeys() {
+            const p = parseBigInt(document.getElementById('elgamal-p').value);
+            const alpha = parseBigInt(document.getElementById('elgamal-alpha').value);
+            const a = parseBigInt(document.getElementById('elgamal-a').value); // Private key
+
+            const outputDiv = document.getElementById('elgamal-key-output');
+
+            if (p === null || alpha === null || a === null) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap isi semua input dengan angka valid.</span>';
+                return;
+            }
+            if (p <= 0n || alpha <= 0n || a <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Semua input harus bilangan positif.</span>';
+                return;
+            }
+            if (!isSmallPrimeTrialDivision(p)) {
+                outputDiv.innerHTML = '<span class="text-red-600">p harus bilangan prima. (Peringatan: Uji primality sederhana, mungkin lambat/tidak akurat untuk angka besar).</span>';
+                return;
+            }
+            if (alpha >= p || alpha <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Generator &alpha; harus dalam rentang (0, p).</span>';
+                return;
+            }
+            if (a >= (p - 1n) || a <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Kunci privat a harus dalam rentang [1, p-2].</span>';
+                return;
+            }
+
+            let steps = [`<strong>Langkah-langkah Pembangkitan Kunci ElGamal:</strong>`];
+
+            steps.push(`\n1.  <strong>Pilih Prima (p) dan Generator (&alpha;):</strong>`);
+            steps.push(`    p = ${p}`);
+            steps.push(`    &alpha; = ${alpha}`);
+
+            steps.push(`\n2.  <strong>Pilih Kunci Privat (a):</strong>`);
+            steps.push(`    a = ${a} (dengan 1 &le; a &le; p-2)`);
+
+            steps.push(`\n3.  <strong>Hitung Kunci Publik (&alpha;<sup>a</sup>):</strong>`);
+            const { result: alpha_a, steps: alpha_a_steps } = power(alpha, a, p); // Public key
+            steps.push(alpha_a_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+            steps.push(`    &alpha;<sup>a</sup> = <strong>${alpha_a}</strong>`);
+
+            elgamalKeys = { p, alpha, a, alpha_a };
+
+            // Auto-fill inputs, but don't make them readonly
+            document.getElementById('elgamal-encrypt-p').value = p.toString();
+            document.getElementById('elgamal-encrypt-alpha').value = alpha.toString();
+            document.getElementById('elgamal-encrypt-alpha-a').value = alpha_a.toString();
+            document.getElementById('elgamal-decrypt-p').value = p.toString();
+            document.getElementById('elgamal-decrypt-a').value = a.toString();
+
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            steps.push(`Kunci Publik: <strong>(p = ${p}, &alpha; = ${alpha}, &alpha;<sup>a</sup> = ${alpha_a})</strong>`);
+            steps.push(`Kunci Privat: <strong>a = ${a}</strong>`);
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        function encryptElGamal() {
+            const p = parseBigInt(document.getElementById('elgamal-encrypt-p').value);
+            const alpha = parseBigInt(document.getElementById('elgamal-encrypt-alpha').value);
+            const alpha_a = parseBigInt(document.getElementById('elgamal-encrypt-alpha-a').value);
+            const kType = document.querySelector('input[name="elgamalKType"]:checked').value;
+            const outputDiv = document.getElementById('elgamal-encrypt-output');
+
+            let m;
+            let originalMessageText = '';
+            let conversionSteps = '';
+            let k;
+            let k_source_info = '';
+
+            // Handle message input
+            const messageType = document.querySelector('input[name="elgamalMessageType"]:checked').value;
+            if (messageType === 'numeric') {
+                m = parseBigInt(document.getElementById('elgamal-message-numeric').value);
+                originalMessageText = `Angka: ${m}`;
+            } else { // messageType === 'text'
+                originalMessageText = document.getElementById('elgamal-message-text').value;
+                const conversionMethod = document.getElementById('elgamal-text-conversion-method').value;
+                const tempDiv = document.createElement('div');
+                m = textToBigInt(originalMessageText, conversionMethod, tempDiv);
+                conversionSteps = tempDiv.innerHTML;
+            }
+
+            if (p === null || alpha === null || alpha_a === null || m === null) {
+                if (!outputDiv.innerHTML.includes('text-red-600')) {
+                    outputDiv.innerHTML = '<span class="text-red-600">Harap isi semua input dengan angka/teks valid.</span>';
+                }
+                return;
+            }
+             if (m >= p || m < 0n) {
+                outputDiv.innerHTML = `<span class="text-red-600">Pesan (m = ${m}) harus dalam rentang [0, p-1 = ${p-1n}]. Ukuran pesan mungkin terlalu besar untuk modulus yang diberikan.</span>`;
+                return;
+            }
+
+            // Handle k value
+            if (kType === 'auto') {
+                k = generateRandomBigInt(1n, p - 2n);
+                document.getElementById('elgamal-k').value = k.toString();
+                k_source_info = `(Otomatis Dihasilkan)`;
+            } else { // manual
+                k = parseBigInt(document.getElementById('elgamal-k').value);
+                k_source_info = `(Manual)`;
+                if (k === null) {
+                    outputDiv.innerHTML = '<span class="text-red-600">Harap isi nilai k secara manual jika opsi manual dipilih.</span>';
+                    return;
+                }
+            }
+
+            if (k >= (p - 1n) || k <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Bilangan bulat acak k harus dalam rentang [1, p-2].</span>';
+                return;
+            }
+
+            let steps = [`<strong>Langkah-langkah Enkripsi ElGamal:</strong>`];
+            steps.push(`\n1.  <strong>Pesan Plaintext (m):</strong>`);
+            steps.push(`    Nilai Asli: ${originalMessageText}`);
+            if (conversionSteps) {
+                steps.push(`    ${conversionSteps}`);
+            }
+            steps.push(`    Nilai Numerik yang Digunakan: <strong>${m}</strong>`);
+            
+            steps.push(`\n2.  <strong>Kunci Publik Penerima:</strong> (p = ${p}, &alpha; = ${alpha}, &alpha;<sup>a</sup> = ${alpha_a})`);
+            steps.push(`3.  <strong>Pilih Bilangan Bulat Acak (k):</strong> ${k} ${k_source_info} (dengan 1 &le; k &le; p-2)`);
+
+            steps.push(`\n4.  <strong>Hitung Ciphertext y:</strong>`);
+            steps.push(`    y = &alpha;<sup>k</sup> mod p`);
+            const { result: y, steps: y_steps } = power(alpha, k, p);
+            steps.push(y_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+            steps.push(`    y = <strong>${y}</strong>`);
+
+            steps.push(`\n5.  <strong>Hitung Ciphertext &delta;:</strong>`);
+            steps.push(`    &delta; = m * (&alpha;<sup>a</sup>)<sup>k</sup> mod p`);
+            const { result: alpha_a_k, steps: alpha_a_k_steps } = power(alpha_a, k, p);
+            steps.push(alpha_a_k_steps.split('\n').map(line => `    ${line}`).join('\n')); // Indent steps
+            steps.push(`    Maka, &delta; = ${m} * ${alpha_a_k} mod ${p} = <strong>${(m * alpha_a_k) % p}</strong>`);
+            const delta = (m * alpha_a_k) % p;
+
+            document.getElementById('elgamal-decrypt-y').value = y.toString();
+            document.getElementById('elgamal-decrypt-delta').value = delta.toString();
+
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            steps.push(`Ciphertext (c): <strong>(y = ${y}, &delta; = ${delta})</strong>`);
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        function decryptElGamal() {
+            const p = parseBigInt(document.getElementById('elgamal-decrypt-p').value);
+            const a = parseBigInt(document.getElementById('elgamal-decrypt-a').value);
+            const y = parseBigInt(document.getElementById('elgamal-decrypt-y').value);
+            const delta = parseBigInt(document.getElementById('elgamal-decrypt-delta').value);
+            const conversionMethod = document.getElementById('elgamal-decrypt-conversion-method').value;
+            const outputDiv = document.getElementById('elgamal-decrypt-output');
+
+            if (p === null || a === null || y === null || delta === null) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap isi semua input dengan angka valid.</span>';
+                return;
+            }
+            if (p <= 0n || a <= 0n || y <= 0n || delta <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Semua input harus bilangan positif.</span>';
+                return;
+            }
+            if (y >= p || delta >= p) {
+                outputDiv.innerHTML = `<span class="text-red-600">Ciphertext y (${y}) dan delta (${delta}) harus kurang dari p (${p}).</span>`;
+                return;
+            }
+
+            let steps = [`<strong>Langkah-langkah Dekripsi ElGamal:</strong>`];
+            steps.push(`\n1.  <strong>Kunci Privat Penerima:</strong> a = ${a}`);
+            steps.push(`2.  <strong>Ciphertext (y, &delta;):</strong> (${y}, ${delta})`);
+
+            steps.push(`\n3.  <strong>Hitung y<sup>-a</sup> mod p (atau (y<sup>a</sup>)<sup>-1</sup> mod p):</strong>`);
+            steps.push(`    Pertama, hitung y<sup>a</sup> mod p:`);
+            const {result: y_a, steps: y_a_steps} = power(y, a, p);
+            steps.push(y_a_steps.split('\n').map(line => `    ${line}`).join('\n'));
+            steps.push(`    Didapat y<sup>a</sup> mod p = ${y_a}`);
+
+            let y_inv_a;
+            try {
+                steps.push(`\n    Selanjutnya, hitung invers modular dari hasil tersebut mod p:`);
+                steps.push(`    Invers dari ${y_a} mod ${p}:`);
+                const {result: inv_y_a, steps: modInv_steps} = modInverse(y_a, p);
+                y_inv_a = inv_y_a;
+                steps.push(modInv_steps.split('\n').map(line => `    ${line}`).join('\n'));
+                steps.push(`    Didapat (y<sup>a</sup>)<sup>-1</sup> mod p = <strong>${y_inv_a}</strong>`);
+            } catch (error) {
+                outputDiv.innerHTML = `<span class="text-red-600">Error menghitung invers modular: ${error.message}. Ini mungkin terjadi jika y<sup>a</sup> tidak koprima dengan p. Pastikan p adalah bilangan prima.</span>`;
+                return;
+            }
+
+            steps.push(`\n4.  <strong>Pulihkan Pesan (m = (y<sup>a</sup>)<sup>-1</sup> * &delta; mod p):</strong>`);
+            steps.push(`    m = ${y_inv_a} * ${delta} mod ${p}`);
+            const decryptedM = (y_inv_a * delta) % p;
+            steps.push(`    m = <strong>${decryptedM}</strong>`);
+
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            steps.push(`Pesan Terdekripsi (angka): <strong>${decryptedM}</strong>`);
+
+            if (conversionMethod === 'ascii') {
+                const decryptedText = bigIntToAsciiText(decryptedM);
+                steps.push(`Pesan Terdekripsi (teks - ASCII): <strong>${decryptedText}</strong>`);
+            } else if (conversionMethod === 'alpha') {
+                const decryptedText = bigIntToAlphaText(decryptedM);
+                steps.push(`Pesan Terdekripsi (teks - Alfabet A=00): <strong>${decryptedText}</strong>`);
+            } else {
+                steps.push(`Pilih metode konversi untuk melihat pesan teks.`);
+            }
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        // Supporting Algorithms
+
+        // Modular Exponentiation
+        function calculateModularExponentiation() {
+            const base = parseBigInt(document.getElementById('me-base').value);
+            const exp = parseBigInt(document.getElementById('me-exp').value);
+            const mod = parseBigInt(document.getElementById('me-mod').value);
+            const outputDiv = document.getElementById('me-output');
+
+            if (base === null || exp === null || mod === null) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap isi semua input dengan angka valid.</span>';
+                return;
+            }
+            if (exp < 0n || mod <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Eksponen harus non-negatif dan modulus harus positif.</span>';
+                return;
+            }
+
+            const { result, steps } = power(base, exp, mod);
+            outputDiv.innerHTML = `<pre>
+${steps}
+
+<strong>Hasil Akhir:</strong>
+${base}<sup>${exp}</sup> mod ${mod} = <strong>${result}</strong>
+            </pre>`;
+        }
+
+        // Extended Euclidean Algorithm
+        function calculateExtendedEuclidean() {
+            const a = parseBigInt(document.getElementById('ee-a').value);
+            const b = parseBigInt(document.getElementById('ee-b').value);
+            const outputDiv = document.getElementById('ee-output');
+
+            if (a === null || b === null) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap isi kedua bilangan dengan angka valid.</span>';
+                return;
+            }
+            if (a < 0n || b < 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap masukkan bilangan non-negatif.</span>';
+                return;
+            }
+
+            const { gcd: g, x, y, steps: egcdSteps } = extendedGcd(a, b);
+            outputDiv.innerHTML = `<pre>
+${egcdSteps}
+
+<strong>Hasil Akhir:</strong>
+GCD(${a}, ${b}): <strong>${g}</strong>
+Koefisien Bézout (x, y) sedemikian hingga ${a}x + ${b}y = ${g}:
+x = <strong>${x}</strong>
+y = <strong>${y}</strong>
+
+Verifikasi: ${a} * ${x} + ${b} * ${y} = ${a * x + b * y} (harus sama dengan GCD)
+            </pre>`;
+        }
+
+        // Chinese Remainder Theorem (Gauss's Algorithm)
+        function solveChineseRemainderTheorem() {
+            const input = document.getElementById('crt-input').value;
+            const outputDiv = document.getElementById('crt-output');
+
+            let steps = [`<strong>Langkah-langkah Chinese Remainder Theorem (Algoritma Gauss):</strong>`];
+            
+            const congruences = input.split(';').map(s => s.trim()).filter(s => s.length > 0).map(s => {
+                const parts = s.split(',');
+                const aVal = parseBigInt(parts[0]);
+                const nVal = parseBigInt(parts[1]);
+                return { a: aVal, n: nVal };
+            });
+
+            if (congruences.some(c => c.a === null || c.n === null || c.n <= 0n)) {
+                outputDiv.innerHTML = '<span class="text-red-600">Format input salah atau modulus tidak valid (harus > 0). Harap gunakan a,n; a,n; ... dengan angka valid.</span>';
+                return;
+            }
+            if (congruences.length === 0) {
+                outputDiv.innerHTML = '<span class="text-red-600">Masukkan setidaknya satu kongruensi.</span>';
+                return;
+            }
+
+            steps.push(`\n<strong>Diberikan sistem kongruensi:</strong>`);
+            congruences.forEach(c => steps.push(`x &equiv; ${c.a} (mod ${c.n})`));
+
+            let allModuli = congruences.map(c => c.n);
+            // Cek apakah semua modulus saling prima
+            for (let i = 0; i < allModuli.length; i++) {
+                for (let j = i + 1; j < allModuli.length; j++) {
+                    const { result: commonGcd } = gcd(allModuli[i], allModuli[j]);
+                    if (commonGcd !== 1n) {
+                        outputDiv.innerHTML = `<span class="text-red-600">Modulus harus saling prima. GCD(${allModuli[i]}, ${allModuli[j]}) = ${commonGcd}</span>`;
+                        return;
+                    }
+                }
+            }
+
+            let N_prod = congruences.reduce((acc, curr) => acc * curr.n, 1n);
+            steps.push(`\nModulus total N = n<sub>1</sub> * n<sub>2</sub> * ... * n<sub>k</sub> = <strong>${N_prod}</strong>`);
+
+            let x = 0n;
+            steps.push(`\n<strong>Perhitungan x = &sum; (a<sub>i</sub> * N<sub>i</sub> * M<sub>i</sub>) mod N:</strong>`);
+
+            for (let i = 0; i < congruences.length; i++) {
+                const cong = congruences[i];
+                const ni = cong.n;
+                const ai = cong.a;
+                const Ni = N_prod / ni;
+                
+                steps.push(`\n  Untuk Kongruensi ${i + 1}: x &equiv; ${ai} (mod ${ni})`);
+                steps.push(`    N<sub>${i + 1}</sub> = N / n<sub>${i + 1}</sub> = ${N_prod} / ${ni} = ${Ni}`);
+                
+                let Mi;
+                try {
+                    const { result: Mi_calc, steps: modInv_steps } = modInverse(Ni, ni);
+                    Mi = Mi_calc;
+                    steps.push(`    M<sub>${i + 1}</sub> = N<sub>${i + 1}</sub><sup>-1</sup> mod n<sub>${i + 1}</sub> = ${Ni}<sup>-1</sup> mod ${ni}`);
+                    steps.push(modInv_steps.split('\n').map(line => `      ${line}`).join('\n')); // Indent steps
+                    steps.push(`      M<sub>${i + 1}</sub> = ${Mi}`);
+
+                } catch (error) {
+                    outputDiv.innerHTML = `<span class="text-red-600">Error: ${error.message} untuk N<sub>i</sub>=${Ni} dan n<sub>i</sub>=${ni}. Ini mungkin terjadi jika N<sub>i</sub> tidak koprima dengan n<sub>i</sub>, yang tidak seharusnya terjadi jika semua n<sub>i</sub> saling prima.</span>`;
+                    return;
+                }
+                
+                const contribution = ai * Ni * Mi;
+                x = (x + contribution) % N_prod;
+
+                steps.push(`    Kontribusi ke x: a<sub>${i + 1}</sub> * N<sub>${i + 1}</sub> * M<sub>${i + 1}</sub> = ${ai} * ${Ni} * ${Mi} = ${contribution}`);
+                steps.push(`    Total x sementara: ${x}`);
+            }
+            
+            x = (x + N_prod) % N_prod; // Ensure x is positive
+
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            steps.push(`Solusi unik x: <strong>${x}</strong>`);
+            steps.push(`Modulus total N: <strong>${N_prod}</strong>`);
+            steps.push(`Sehingga, x &equiv; <strong>${x}</strong> (mod <strong>${N_prod}</strong>)`);
+
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        // --- NEW SECTIONS ---
+
+        // Prime Number Utilities
+        async function checkPrimeAndPosition() {
+            const numInput = parseBigInt(document.getElementById('prime-check-number').value);
+            const outputDiv = document.getElementById('prime-check-output');
+
+            if (numInput === null || numInput <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap masukkan bilangan positif yang valid.</span>';
+                return;
+            }
+            // Increase the limit for sieve, but still warn for very large numbers
+            const SIEVE_LIMIT_CHECK_POSITION = 10_000_000n; // ~10 million
+            
+            let steps = [`<strong>Memeriksa Bilangan Prima & Posisi untuk ${numInput}:</strong>`];
+            steps.push(`\n1.  <strong>Uji Primality:</strong>`);
+            const isPrimeResult = isSmallPrimeTrialDivision(numInput); // Use the simple trial division
+            if (isPrimeResult) {
+                steps.push(`    ${numInput} adalah bilangan prima.`);
+                if (numInput <= SIEVE_LIMIT_CHECK_POSITION) {
+                    steps.push(`\n2.  <strong>Mencari Posisi Prima (menggunakan Sieve of Eratosthenes hingga ${numInput > 1000n ? 'perkiraan batas' : numInput}):</strong>`);
+                    const { primes, steps: sieveSteps } = sieveOfEratosthenes(numInput);
+                    steps.push(sieveSteps);
+                    const position = primes.indexOf(numInput) + 1;
+                    steps.push(`\n<strong>Hasil Akhir:</strong>`);
+                    steps.push(`<strong>${numInput}</strong> adalah bilangan prima ke-<strong>${position}</strong>.`);
+                } else {
+                    steps.push(`\n<span class="text-orange-600">Peringatan: ${numInput} terlalu besar untuk menghitung posisi prima secara efisien di browser (${numInput} > ${SIEVE_LIMIT_CHECK_POSITION}). Posisi prima tidak akan dihitung.</span>`);
+                    steps.push(`\n<strong>Hasil Akhir:</strong>`);
+                    steps.push(`<strong>${numInput}</strong> adalah bilangan prima.`);
+                }
+            } else {
+                steps.push(`    ${numInput} bukan bilangan prima.`);
+                steps.push(`\n<strong>Hasil Akhir:</strong>`);
+                steps.push(`<strong>${numInput}</strong> bukan bilangan prima.`);
+            }
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        async function findNthPrime() {
+            const nInput = parseBigInt(document.getElementById('nth-prime-input').value);
+            const outputDiv = document.getElementById('nth-prime-output');
+
+            if (nInput === null || nInput <= 0n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap masukkan N positif yang valid.</span>';
+                return;
+            }
+            const NTH_PRIME_MAX_N = 1_000_000n; // Max N to attempt, this will result in a sieve limit of ~18 million
+            if (nInput > NTH_PRIME_MAX_N) {
+                outputDiv.innerHTML = `<span class="text-red-600">Peringatan: Nilai N (${nInput}) terlalu besar. Perhitungan ini akan sangat lambat atau tidak mungkin dalam browser. Coba N yang lebih kecil (maksimal sekitar ${NTH_PRIME_MAX_N.toLocaleString()}).</span>`;
+                return;
+            }
+
+            let steps = [`<strong>Mencari Bilangan Prima Ke-${nInput}:</strong>`];
+            steps.push(`\n1.  <strong>Memperkirakan Batas Atas untuk Sieve:</strong>`);
+            // Approximate upper bound for the nth prime (n * ln(n) + n * ln(ln(n)))
+            let limit;
+            if (nInput < 6n) { // Small N values
+                limit = 15n;
+            } else {
+                const ln_n = Math.log(Number(nInput));
+                const ln_ln_n = Math.log(ln_n);
+                limit = BigInt(Math.ceil(Number(nInput) * (ln_n + ln_ln_n) * 1.1)); // Add a buffer
+            }
+            steps.push(`    Perkiraan batas atas pencarian (berdasarkan N): ${limit.toLocaleString()}`);
+
+            steps.push(`\n2.  <strong>Menjalankan Sieve of Eratosthenes hingga perkiraan batas:</strong>`);
+            const { primes, steps: sieveSteps } = sieveOfEratosthenes(limit);
+            steps.push(sieveSteps);
+
+            if (primes.length >= nInput) {
+                const nthPrime = primes[Number(nInput) - 1];
+                steps.push(`\n<strong>Hasil Akhir:</strong>`);
+                steps.push(`Bilangan prima ke-<strong>${nInput}</strong> adalah: <strong>${nthPrime}</strong>`);
+            } else {
+                steps.push(`\n<span class="text-red-600">Tidak cukup bilangan prima ditemukan dalam batas perhitungan yang diperkirakan. Coba tingkatkan batas atau masukkan N yang lebih kecil.</span>`);
+            }
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        // Generator & Discrete Logarithm
+        function findSmallestGenerator() {
+            const p = parseBigInt(document.getElementById('generator-p').value);
+            const outputDiv = document.getElementById('generator-output');
+
+            if (p === null || p <= 1n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap masukkan bilangan prima p yang valid (> 1).</span>';
+                return;
+            }
+            if (!isSmallPrimeTrialDivision(p)) {
+                outputDiv.innerHTML = '<span class="text-red-600">p harus bilangan prima. (Peringatan: Uji primality sederhana, mungkin lambat/tidak akurat untuk angka besar).</span>';
+                return;
+            }
+            const MAX_GENERATOR_P = 10_000n; // Increased limit
+            if (p > MAX_GENERATOR_P) { 
+                outputDiv.innerHTML = `<span class="text-red-600">Peringatan: Nilai p (${p}) terlalu besar. Perhitungan ini akan sangat lambat atau tidak mungkin dalam browser. Coba p yang lebih kecil (maksimal sekitar ${MAX_GENERATOR_P.toLocaleString()}).</span>`;
+                return;
+            }
+
+            let steps = [`<strong>Mencari Generator Terkecil untuk $\mathbb{Z}_{${p}}^{*}$:</strong>`];
+            steps.push(`\n1.  <strong>Faktorisasi &phi;(p) = p-1:</strong>`);
+            const phi_p = p - 1n;
+            steps.push(`    &phi;(p) = ${phi_p}`);
+            const primeFactors = getPrimeFactors(phi_p);
+            steps.push(`    Faktor prima unik dari &phi;(p) (${phi_p}): ${primeFactors.join(', ')}`);
+
+            steps.push(`\n2.  <strong>Uji Kandidat Generator:</strong>`);
+            steps.push(`    Untuk setiap g dari 2 hingga p-1, periksa apakah g<sup>&phi;(p)/q</sup> &equiv; 1 (mod p) untuk setiap faktor prima q dari &phi;(p).`);
+            
+            let foundGenerator = null;
+            // Iterate from 2 up to p-1 to find the smallest generator
+            for (let g = 2n; g < p; g++) {
+                let isGenerator = true;
+                steps.push(`\n    Menguji g = ${g}:`);
+                for (let q of primeFactors) {
+                    const exponent = phi_p / q;
+                    // Check if g^( (p-1)/q ) mod p == 1
+                    const { result: res, steps: power_steps } = power(g, exponent, p);
+                    // Indent the power calculation steps
+                    steps.push(power_steps.split('\n').map(line => `      ${line}`).join('\n'));
+                    steps.push(`      ${g}<sup>${exponent}</sup> mod ${p} = ${res}`);
+                    if (res === 1n) {
+                        isGenerator = false;
+                        steps.push(`      Karena hasilnya 1, ${g} BUKAN generator.`);
+                        break; // Not a generator, move to next g
+                    }
+                }
+                if (isGenerator) {
+                    foundGenerator = g;
+                    steps.push(`      Karena tidak ada g<sup>&phi;(p)/q</sup> &equiv; 1 (mod p), ${g} adalah generator!`);
+                    break; // Found the smallest generator
+                }
+            }
+
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            if (foundGenerator !== null) {
+                steps.push(`Generator terkecil untuk $\mathbb{Z}_{${p}}^{*}$ adalah: <strong>${foundGenerator}</strong>`);
+            } else {
+                steps.push(`<span class="text-red-600">Tidak dapat menemukan generator terkecil dalam rentang yang diuji. Pastikan p adalah prima.</span>`);
+            }
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+
+        function solveDiscreteLogarithm() {
+            const g = parseBigInt(document.getElementById('dlog-g').value);
+            const y = parseBigInt(document.getElementById('dlog-y').value);
+            const p = parseBigInt(document.getElementById('dlog-p').value);
+            const outputDiv = document.getElementById('dlog-output');
+
+            if (g === null || y === null || p === null) {
+                outputDiv.innerHTML = '<span class="text-red-600">Harap isi semua input dengan angka valid.</span>';
+                return;
+            }
+            if (g <= 0n || y <= 0n || p <= 1n) {
+                outputDiv.innerHTML = '<span class="text-red-600">Semua input harus positif; p harus > 1.</span>';
+                return;
+            }
+            if (!isSmallPrimeTrialDivision(p)) {
+                outputDiv.innerHTML = '<span class="text-red-600">Modulus p harus bilangan prima. (Peringatan: Uji primality sederhana).</span>';
+                return;
+            }
+            if (g >= p || y >= p) {
+                outputDiv.innerHTML = '<span class="text-red-600">g dan y harus kurang dari p.</span>';
+                return;
+            }
+            const MAX_DLOG_P = 10_000n; // Increased limit
+            if (p > MAX_DLOG_P) { 
+                outputDiv.innerHTML = `<span class="text-red-600">Peringatan: Modulus p (${p}) terlalu besar untuk pemecah logaritma diskrit brute-force. Perhitungan dapat memakan waktu lama dan mungkin membekukan browser. Coba p < ${MAX_DLOG_P.toLocaleString()}.</span>`;
+                return;
+            }
+
+            let steps = [`<strong>Memecahkan Logaritma Diskrit (Brute-Force):</strong>`];
+            steps.push(`\nMencari x sedemikian sehingga ${g}<sup>x</sup> &equiv; ${y} (mod ${p})`);
+            steps.push(`  Metode ini mencoba setiap kemungkinan nilai x dari 0 hingga p-2.`);
+
+            let foundX = null;
+            for (let x = 0n; x < p - 1n; x++) { // x goes from 0 to p-2 for Z_p^*
+                const { result: computedY, steps: power_steps } = power(g, x, p);
+                steps.push(`\n  Menguji x = ${x}:`);
+                steps.push(power_steps.split('\n').map(line => `    ${line}`).join('\n'));
+                steps.push(`    ${g}<sup>${x}</sup> mod ${p} = ${computedY}`);
+                if (computedY === y) {
+                    foundX = x;
+                    steps.push(`    Cocok! Ditemukan x = ${x}.`);
+                    break;
+                } else {
+                    steps.push(`    Tidak cocok.`);
+                }
+            }
+
+            steps.push(`\n<strong>Hasil Akhir:</strong>`);
+            if (foundX !== null) {
+                steps.push(`Solusi logaritma diskrit (x): <strong>${foundX}</strong>`);
+                steps.push(`Verifikasi: ${g}<sup>${foundX}</sup> &equiv; ${y} (mod ${p})`);
+            } else {
+                steps.push(`<span class="text-red-600">Tidak ada solusi x yang ditemukan dalam rentang [0, p-2]. Mungkin ${g} bukan generator atau y bukan anggota grup.</span>`);
+            }
+            outputDiv.innerHTML = `<pre>${steps.join('\n')}</pre>`;
+        }
+
+        // --- UI LOGIC ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuItems = document.querySelectorAll('.menu-item');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            function showSection(targetId) {
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(targetId).classList.add('active');
+
+                menuItems.forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`.menu-item[data-target="${targetId}"]`).classList.add('active');
+            }
+
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const targetId = item.dataset.target;
+                    showSection(targetId);
+                });
+            });
+
+            // Initial state for message type inputs
+            toggleRsaMessageInput();
+            toggleRabinMessageInput();
+            toggleElGamalMessageInput();
+            toggleElGamalKInput();
+
+            // Show welcome section by default on load
+            showSection('welcome-section');
+        });
+    </script>
+</body>
+</html>
